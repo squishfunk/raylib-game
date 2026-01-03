@@ -85,6 +85,25 @@ void render_system(ECS *ecs){
             ecs->entities[i].renderable.radius,
             ecs->entities[i].renderable.color
         );
+
+        if (ecs->entities[i].tags & TAG_ENEMY || ecs->entities[i].tags & TAG_PLAYER){
+            
+            Entity *enemy = &ecs->entities[i];
+            Vector2 position = enemy->transform.position;
+
+            int width = enemy->renderable.radius * 2.5;
+            int height = SCREEN_WIDTH / 100;
+
+            int x = position.x - width / 2;
+            int y = position.y + enemy->renderable.radius * 1.5;
+
+
+            DrawRectangle(x, y, width, height, DARKGRAY);
+
+            DrawRectangle(x, y, (int)(width * enemy->health.healthPoints / enemy->health.maxHealthPoints), height, RED);
+
+            DrawRectangleLines(x, y, width, height, BLACK);
+        }
     }
 }
 
