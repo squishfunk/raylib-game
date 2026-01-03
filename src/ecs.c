@@ -75,6 +75,7 @@ void player_input_system(ECS *ecs, int entityId){
 void bullet_cleanup_system(ECS *ecs){
     for(int i = 0; i < ecs->entityCount; i++){
         if (!ecs->entities[i].active || !ecs->entities[i].hasTransform) continue;
+        if (!(ecs->entities[i].tags & TAG_BULLET)) continue;
         
         Vector2 pos = ecs->entities[i].transform.position;
         if (pos.x < 0 || pos.x > SCREEN_WIDTH || 
@@ -107,8 +108,33 @@ void shooting_system(ECS *ecs, int playerId, float currentTime, float *lastShoot
         ecs_add_tranform(ecs, bulletId, position);
         ecs_add_velocity(ecs, bulletId, velocity);
         ecs_add_renderable(ecs, bulletId, 5.0f, ORANGE);
+        ecs->entities[bulletId].tags = TAG_BULLET;
     }
 
 
     *lastShootTime = currentTime;
+}
+
+void enemy_spawn_system(ECS *ecs){
+
+    float currentTime = GetTime();
+    static float lastSpawnTime = 0.0f;
+
+    if(currentTime - lastSpawnTime > SPAWN_COOLDOWN){
+        int enemyId = ecs_create_entity(ecs);
+        if (enemyId >= 0){
+            float radius = 20.0f;
+
+            float randomX = (float)GetRandomValue(0 + radius, SCREEN_WIDTH - radius);
+            float randomY = (float)GetRandomValue(0 + radius, SCREEN_HEIGHT - radius);
+
+            printf("%d %d \n", 0 + (int)radius, SCREEN_WIDTH - (int)radius);
+
+            ecs_add_tranform(ecs, enemyId, (Vector2){randomX, randomY});
+            ecs_add_velocity(ecs, enemyId, (Vector2){0,0});
+            ecs_add_renderable(ecs, enemyId, 20.0f, RED);
+            lastSpawnTime = currentTime;
+        }
+    }
+    
 }

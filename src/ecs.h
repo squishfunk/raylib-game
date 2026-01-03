@@ -7,11 +7,13 @@
 #define SCREEN_WIDTH 1000
 #define SCREEN_HEIGHT 650 
 
-#define MAX_ENTITIES 10 /*  TODO */
+#define MAX_ENTITIES 1024 /*  TODO */
 #define MOVEMENT_SPEED 5
 #define SHOOT_COOLDOWN 0.25f
 #define BULLET_SPEED 10
 #define BULLET_RADIUS 5
+
+#define SPAWN_COOLDOWN 0.002f
 
 typedef struct {
     Vector2 position;
@@ -26,6 +28,15 @@ typedef struct {
     Color color;
 } RenderableComponent;
 
+typedef enum {
+    TAG_NONE = 0,
+    TAG_BULLET = 1 << 0,    // 1
+    // TAG_PLAYER = 1 << 1,    // 2
+    // TAG_ENEMY = 1 << 2,     // 4
+    // TAG_PICKUP = 1 << 3,    // 8
+    // TAG_WALL = 1 << 4,      // 16
+} EntityTag;
+
 typedef struct {
     bool active;
     TransformComponent transform;
@@ -35,6 +46,8 @@ typedef struct {
     bool hasTransform;
     bool hasVelocity;
     bool hasRenderable;
+
+    EntityTag tags;
 } Entity;
 
 typedef struct {
