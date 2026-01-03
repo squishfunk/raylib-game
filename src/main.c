@@ -14,11 +14,15 @@ int main(void)
 
     ECS ecs = {0};
 
+    
+    /*  PLAYER INIT */
     int playerId = ecs_create_entity(&ecs);
     ecs_add_tranform(&ecs, playerId, (Vector2){0,0});
     ecs_add_velocity(&ecs, playerId, (Vector2){0,0});
     ecs_add_renderable(&ecs, playerId, 20.0f, GREEN);
-
+    ecs_add_health(&ecs, playerId, 100, 100);
+    ecs.entities[playerId].tags = TAG_PLAYER;
+    
     float lastShootTime = 0.0f;
 
     while (!WindowShouldClose())
@@ -29,6 +33,8 @@ int main(void)
         shooting_system(&ecs, playerId, currentTime, &lastShootTime);
         enemy_spawn_system(&ecs);
         movement_system(&ecs);
+        collision_system(&ecs);
+        health_system(&ecs);
         
         BeginDrawing();
 

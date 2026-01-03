@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <math.h>
 #include <stdio.h>
 #include "ecs.h"
 
@@ -40,6 +41,32 @@ int ecs_add_renderable(ECS *ecs, int entityId, float radius, Color color){
     return 0;
 }
 
+int ecs_add_health(ECS *ecs, int entityId, int initialHealthPoints, int maxHealthPoints){
+    ecs->entities[entityId].health.healthPoints = initialHealthPoints;
+    ecs->entities[entityId].health.maxHealthPoints = maxHealthPoints;
+    ecs->entities[entityId].health.lastDamageTime = 0.0f;
+    ecs->entities[entityId].hasHealth = true;
+    return 0;
+}
+
+int ecs_add_damage_cooldown(ECS *ecs, int entityId){
+    ecs->entities[entityId].damageCooldown.lastDamageTime = 0.0f;
+    ecs->entities[entityId].hasDamageCooldown = true;
+    return 0;
+}
+
+
+
+
+
+bool _check_circle_collision(Vector2 pos1, float radius1, Vector2 pos2, float radius2){
+    float dx = pos1.x - pos2.x;
+    float dy = pos1.y - pos2.y;
+    float distance = sqrtf(dx*dx + dy*dy);
+    float minDistance = radius1 + radius2;
+    return distance < minDistance;
+}
+
 void movement_system(ECS *ecs){
     for(int i = 0; i < ecs->entityCount; i++){
         if (!ecs->entities[i].active || !ecs->entities[i].hasTransform || !ecs->entities[i].hasVelocity) continue;
@@ -72,22 +99,40 @@ void player_input_system(ECS *ecs, int entityId){
     ecs->entities[entityId].velocity.velocity = velocity;
 }
 
-void bullet_cleanup_system(ECS *ecs){
+void bullet_system(ECS *ecs){
     for(int i = 0; i < ecs->entityCount; i++){
         if (!ecs->entities[i].active || !ecs->entities[i].hasTransform) continue;
         if (!(ecs->entities[i].tags & TAG_BULLET)) continue;
+
+        Entity *bullet = &ecs->entities[i];
         
-        Vector2 pos = ecs->entities[i].transform.position;
+        Vector2 pos = bullet->transform.position;
+
         if (pos.x < 0 || pos.x > SCREEN_WIDTH || 
             pos.y < 0 || pos.y > SCREEN_HEIGHT) {
-            printf("Clear bullet \n");
-            ecs->entities[i].active = false;
+            
+        }
+
+        for (int j = 0; j < ecs->entityCount; j++){
+            if (i == j) continue;
+            if (!(ecs->entities[j].tags & TAG_ENEMY)) continue;
+
+            Entity *enemy = &ecs->entities[j];
+            if(_check_circle_collision(pos, bullet->renderable.radius, enemy->transform.position, enemy->renderable.radius)){
+                bool canDamage = true;
+                float currentTime = GetTime();
+
+                enemy->health.healthPoints -= BULLET_DAMAGE;
+                enemy->health.lastDamageTime = currentTime;
+                ecs->entities[i].active = false;
+                printf("Enemy id: %d Hit. Current health: %d \n", j, enemy->health.healthPoints);
+            }
         }
     }
 }
 
 void shooting_system(ECS *ecs, int playerId, float currentTime, float *lastShootTime){
-    bullet_cleanup_system(ecs);
+    bullet_system(ecs);
     if (!(IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) || 
           IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT))) return;
 
@@ -128,13 +173,65 @@ void enemy_spawn_system(ECS *ecs){
             float randomX = (float)GetRandomValue(0 + radius, SCREEN_WIDTH - radius);
             float randomY = (float)GetRandomValue(0 + radius, SCREEN_HEIGHT - radius);
 
-            printf("%d %d \n", 0 + (int)radius, SCREEN_WIDTH - (int)radius);
-
             ecs_add_tranform(ecs, enemyId, (Vector2){randomX, randomY});
             ecs_add_velocity(ecs, enemyId, (Vector2){0,0});
             ecs_add_renderable(ecs, enemyId, 20.0f, RED);
+            ecs_add_health(ecs, enemyId, 100, 100);
+            ecs->entities[enemyId].tags = TAG_ENEMY;
             lastSpawnTime = currentTime;
         }
     }
-    
+}
+
+void collision_system(ECS *ecs){
+    float currentTime = GetTime();
+
+    int playerId = -1;
+    for(int i = 0; i < ecs->entityCount; i++){
+        if(ecs->entities[i].active && (ecs->entities[i].tags & TAG_PLAYER)){
+            playerId = i;
+            break;
+        }
+    }
+
+    if(playerId < 0 || !ecs->entities[playerId].hasHealth) return;
+
+    Entity *player = &ecs->entities[playerId];
+
+    for(int i = 0; i < ecs->entityCount; i++){
+        if(i == playerId) continue;
+        if(!ecs->entities[i].active) continue;
+        if(!(ecs->entities[i].tags & TAG_ENEMY)) continue;
+        if(!ecs->entities[i].hasTransform || !ecs->entities[i].hasRenderable) continue;
+
+        Entity *enemy = &ecs->entities[i];
+        
+        if(_check_circle_collision(
+        player->transform.position, player->renderable.radius, 
+        enemy->transform.position, enemy->renderable.radius))
+        {
+            bool canDamage = true;
+            if(currentTime - player->health.lastDamageTime < DAMAGE_COOLDOWN){
+                canDamage = false;
+            }
+
+            if(canDamage){
+                player->health.healthPoints -= ENEMY_DAMAGE;
+                player->health.lastDamageTime = currentTime;
+                printf("Player Health: %d \n", player->health.healthPoints);
+            }
+        }
+
+    }
+}
+
+void health_system(ECS *ecs){
+    for(int i = 0; i < ecs->entityCount; i++){
+        if(!ecs->entities[i].active || !ecs->entities[i].hasHealth) continue;
+        
+        if(ecs->entities[i].health.healthPoints <= 0){
+            ecs->entities[i].active = false;
+            printf("Entity %d died!\n", i);
+        }
+    }
 }
