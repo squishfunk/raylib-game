@@ -38,10 +38,6 @@ typedef struct {
     float lastDamageTime;
 } HealthComponent;
 
-typedef struct {
-    float lastDamageTime;
-} DamageCooldownComponent;
-
 typedef enum {
     TAG_NONE = 0,
     TAG_BULLET = 1 << 0,    // 1
@@ -53,33 +49,62 @@ typedef enum {
 
 typedef struct {
     bool active;
-    TransformComponent transform;
-    VelocityComponent velocity;
-    RenderableComponent renderable;
-    HealthComponent health;
-    DamageCooldownComponent damageCooldown;
-
-    bool hasTransform;
-    bool hasVelocity;
-    bool hasRenderable;
-    bool hasHealth;
-    bool hasDamageCooldown;
-
     EntityTag tags;
 } Entity;
+
+// Storage dla każdego typu komponentu
+typedef struct {
+    TransformComponent data[MAX_ENTITIES];
+    bool active[MAX_ENTITIES];
+} TransformStorage;
+
+typedef struct {
+    VelocityComponent data[MAX_ENTITIES];
+    bool active[MAX_ENTITIES];
+} VelocityStorage;
+
+typedef struct {
+    RenderableComponent data[MAX_ENTITIES];
+    bool active[MAX_ENTITIES];
+} RenderableStorage;
+
+typedef struct {
+    HealthComponent data[MAX_ENTITIES];
+    bool active[MAX_ENTITIES];
+} HealthStorage;
 
 typedef struct {
     Entity entities[MAX_ENTITIES];
     int entityCount;
+    
+    TransformStorage transforms;
+    VelocityStorage velocities;
+    RenderableStorage renderables;
+    HealthStorage healths;
 } ECS;
 
 /* ECS */
 int ecs_create_entity(ECS *ecs);
-int ecs_add_tranform(ECS *ecs, int entityId, Vector2 position);
-int ecs_add_velocity(ECS *ecs, int entityId, Vector2 velocity);
-int ecs_add_renderable(ECS *ecs, int entityId, float radius, Color color);
-int ecs_add_health(ECS *ecs, int entityId, int initialHealthPoints, int maxHealthPoints);
-int ecs_add_damage_cooldown(ECS *ecs, int entityId);
+void ecs_destroy_entity(ECS *ecs, int entityId);
+
+/* Components - add */
+void ecs_add_tranform(ECS *ecs, int entityId, Vector2 position);
+void ecs_add_velocity(ECS *ecs, int entityId, Vector2 velocity);
+void ecs_add_renderable(ECS *ecs, int entityId, float radius, Color color);
+void ecs_add_health(ECS *ecs, int entityId, int initialHealthPoints, int maxHealthPoints);
+
+/* Components -  */
+void ecs_remove_transform(ECS *ecs, int entityId);
+void ecs_remove_velocity(ECS *ecs, int entityId);
+void ecs_remove_renderable(ECS *ecs, int entityId);
+void ecs_remove_health(ECS *ecs, int entityId);
+void ecs_remove_damage_cooldown(ECS *ecs, int entityId);
+
+/* Components - get */
+TransformComponent* ecs_get_transform(ECS *ecs, int entityId);
+VelocityComponent* ecs_get_velocity(ECS *ecs, int entityId);
+RenderableComponent* ecs_get_renderable(ECS *ecs, int entityId);
+HealthComponent* ecs_get_health(ECS *ecs, int entityId);
 
 /* Systems */
 void movement_system(ECS *ecs);
