@@ -1,7 +1,10 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "ecs.h"
+#include "../ecs.h"
+#include "../map.h"
+
+#define GAME_NAME "GOWNO"
 
 typedef enum {
     GAME_STATE_MENU,
@@ -15,6 +18,7 @@ typedef struct {
     ECS ecs;
     int playerId;
     float lastShootTime;
+    Map map;
 } Game;
 
 void game_init(void);
@@ -25,5 +29,9 @@ void game_state_menu_update(Game *game);
 void game_state_menu_render(void);
 void game_state_playing_update(Game *game);
 void game_state_playing_render(Game *game);
+void game_state_paused_update(Game *game);
+void game_state_paused_render(Game *game);
+void game_state_game_over_update(Game *game);
+void game_state_game_over_render();
 
 #endif
