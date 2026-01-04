@@ -52,7 +52,6 @@ typedef struct {
     EntityTag tags;
 } Entity;
 
-// Storage dla każdego typu komponentu
 typedef struct {
     TransformComponent data[MAX_ENTITIES];
     bool active[MAX_ENTITIES];
