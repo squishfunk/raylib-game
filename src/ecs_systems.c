@@ -1,117 +1,8 @@
 #include <raylib.h>
+#include <raymath.h>
 #include <math.h>
 #include <stdio.h>
 #include "ecs.h"
-
-int ecs_create_entity(ECS *ecs){
-    for(int i = 0; i < ecs->entityCount; i++){
-        if(!ecs->entities[i].active){
-            ecs->entities[i] = (Entity){0};
-            ecs->entities[i].active = true;
-
-            ecs->transforms.active[i] = false;
-            ecs->velocities.active[i] = false;
-            ecs->renderables.active[i] = false;
-            ecs->healths.active[i] = false;
-            return i;
-        }
-    }
-
-    if(ecs->entityCount >= MAX_ENTITIES){
-        return -1;
-    }
-
-    int entityId = ecs->entityCount++;
-    ecs->entities[entityId] = (Entity){0};
-    ecs->entities[entityId].active = true;
-    
-    ecs->transforms.active[entityId] = false;
-    ecs->velocities.active[entityId] = false;
-    ecs->renderables.active[entityId] = false;
-    ecs->healths.active[entityId] = false;
-    return entityId;
-}
-
-void ecs_destroy_entity(ECS *ecs, int entityId){
-    if(entityId < 0 || entityId >= ecs->entityCount) return;
-    
-    ecs->entities[entityId].active = false;
-    
-    ecs->transforms.active[entityId] = false;
-    ecs->velocities.active[entityId] = false;
-    ecs->renderables.active[entityId] = false;
-    ecs->healths.active[entityId] = false;
-}
-
-void ecs_add_tranform(ECS *ecs, int entityId, Vector2 position){
-    ecs->transforms.data[entityId].position = position;
-    ecs->transforms.active[entityId] = true;
-}
-
-void ecs_add_velocity(ECS *ecs, int entityId, Vector2 velocity){
-    ecs->velocities.data[entityId].velocity = velocity;
-    ecs->velocities.active[entityId] = true;
-}
-
-void ecs_add_renderable(ECS *ecs, int entityId, float radius, Color color){
-    ecs->renderables.data[entityId].radius = radius;
-    ecs->renderables.data[entityId].color = color;
-    ecs->renderables.active[entityId] = true;
-}
-
-void ecs_add_health(ECS *ecs, int entityId, int initialHealthPoints, int maxHealthPoints){
-    ecs->healths.data[entityId].healthPoints = initialHealthPoints;
-    ecs->healths.data[entityId].maxHealthPoints = maxHealthPoints;
-    ecs->healths.data[entityId].lastDamageTime = 0.0f;
-    ecs->healths.active[entityId] = true;
-}
-
-void ecs_remove_transform(ECS *ecs, int entityId){
-    ecs->transforms.active[entityId] = false;
-}
-
-void ecs_remove_velocity(ECS *ecs, int entityId){
-    ecs->velocities.active[entityId] = false;
-}
-
-void ecs_remove_renderable(ECS *ecs, int entityId){
-    ecs->renderables.active[entityId] = false;
-}
-
-void ecs_remove_health(ECS *ecs, int entityId){
-    ecs->healths.active[entityId] = false;
-}
-
-TransformComponent* ecs_get_transform(ECS *ecs, int entityId){
-    if(entityId < 0 || entityId >= ecs->entityCount) return NULL;
-    if(ecs->transforms.active[entityId])
-        return &ecs->transforms.data[entityId];
-    return NULL;
-}
-
-VelocityComponent* ecs_get_velocity(ECS *ecs, int entityId){
-    if(entityId < 0 || entityId >= ecs->entityCount) return NULL;
-    if(ecs->velocities.active[entityId])
-        return &ecs->velocities.data[entityId];
-    return NULL;
-}
-
-RenderableComponent* ecs_get_renderable(ECS *ecs, int entityId){
-    if(entityId < 0 || entityId >= ecs->entityCount) return NULL;
-    if(ecs->renderables.active[entityId])
-        return &ecs->renderables.data[entityId];
-    return NULL;
-}
-
-HealthComponent* ecs_get_health(ECS *ecs, int entityId){
-    if(entityId < 0 || entityId >= ecs->entityCount) return NULL;
-    if(ecs->healths.active[entityId])
-        return &ecs->healths.data[entityId];
-    return NULL;
-}
-
-
-
 
 
 bool _check_circle_collision(Vector2 pos1, float radius1, Vector2 pos2, float radius2){
@@ -120,6 +11,18 @@ bool _check_circle_collision(Vector2 pos1, float radius1, Vector2 pos2, float ra
     float distance = sqrtf(dx*dx + dy*dy);
     float minDistance = radius1 + radius2;
     return distance < minDistance;
+}
+
+int _get_player_id(ECS *ecs){
+
+    int playerId = -1;
+    for(int i = 0; i < ecs->entityCount; i++){
+        if(ecs->entities[i].active && (ecs->entities[i].tags & TAG_PLAYER)){
+            playerId = i;
+            break;
+        }
+    }
+    return playerId;
 }
 
 void movement_system(ECS *ecs){
@@ -264,13 +167,7 @@ void enemy_spawn_system(ECS *ecs){
 void collision_system(ECS *ecs){
     float currentTime = GetTime();
 
-    int playerId = -1;
-    for(int i = 0; i < ecs->entityCount; i++){
-        if(ecs->entities[i].active && (ecs->entities[i].tags & TAG_PLAYER)){
-            playerId = i;
-            break;
-        }
-    }
+    int playerId = _get_player_id(ecs);
 
     if(playerId < 0 || !ecs->healths.active[playerId]) return;
     if(!ecs->transforms.active[playerId] || !ecs->renderables.active[playerId]) return;
@@ -315,5 +212,36 @@ void health_system(ECS *ecs){
             ecs->entities[i].active = false;
             printf("Entity %d died!\n", i);
         }
+    }
+}
+
+void enemy_movement_system(ECS *ecs){
+    for(int i = 0; i < ecs->entityCount; i++){
+        if(!ecs->entities[i].active || !(ecs->entities[i].tags & TAG_ENEMY)) continue;
+
+        int playerId = _get_player_id(ecs); 
+        
+        Vector2 enemyPos = ecs->transforms.data[i].position;
+        Vector2 playerPos = ecs->transforms.data[playerId].position;
+
+        printf("Player pos: X: %f Y: %f", playerPos.x, playerPos.y);
+        printf("Enemy pos: X: %f Y: %f", enemyPos.x, enemyPos.y);
+
+        float speed = 1.0f;
+
+        Vector2 direction = Vector2Subtract(playerPos, enemyPos);
+
+        float length = Vector2Length(direction);
+        if (length < 0.001f) {
+            ecs->velocities.data[i].velocity = (Vector2){0, 0};
+            continue;
+        }
+
+        Vector2 velocity = Vector2Scale(Vector2Normalize(direction), speed);
+
+        printf("Direction pos: X: %f Y: %f", enemyPos.x, enemyPos.y);
+
+
+        ecs->velocities.data[i].velocity = velocity;
     }
 }

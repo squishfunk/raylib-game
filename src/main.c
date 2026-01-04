@@ -32,6 +32,7 @@ int main(void)
         player_input_system(&ecs, playerId);
         shooting_system(&ecs, playerId, currentTime, &lastShootTime);
         enemy_spawn_system(&ecs);
+        enemy_movement_system(&ecs);
         movement_system(&ecs);
         collision_system(&ecs);
         health_system(&ecs);

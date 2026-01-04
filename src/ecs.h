@@ -17,7 +17,7 @@
 #define DAMAGE_COOLDOWN 1
 
 #define ENEMY_DAMAGE 10
-#define BULLET_DAMAGE 10
+#define BULLET_DAMAGE 40
 
 typedef struct {
     Vector2 position;
@@ -119,5 +119,6 @@ void bullet_system(ECS *ecs);
 
 /* Enemies */
 void enemy_spawn_system(ECS *ecs);
+void enemy_movement_system(ECS *ecs);
 
 #endif
