@@ -109,12 +109,14 @@ HealthComponent* ecs_get_health(ECS *ecs, int entityId);
 /* Systems */
 void movement_system(ECS *ecs);
 void render_system(ECS *ecs);
-void player_input_system(ECS *ecs, int entityId);
 void collision_system(ECS *ecs);
 void health_system(ECS *ecs);
 
 /*  Shooting */
+int player_create(ECS *ecs, int initX, int initY);
+void player_input_system(ECS *ecs, int entityId);
 void player_shooting_system(ECS *ecs, int playerId, float currentTime, float *lastShootTime);
+
 void bullet_system(ECS *ecs);
 
 /* Enemies */

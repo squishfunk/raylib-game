@@ -2,6 +2,16 @@
 #include "../ecs.h"
 #include <raymath.h>
 
+int player_create(ECS *ecs, int initX, int initY){
+    int playerId = ecs_create_entity(ecs);
+    ecs_add_tranform(ecs, playerId, (Vector2){initX,initY});
+    ecs_add_velocity(ecs, playerId, (Vector2){0,0});
+    ecs_add_renderable(ecs, playerId, 20.0f, GREEN);
+    ecs_add_health(ecs, playerId, 100, 100);
+    ecs->entities[playerId].tags = TAG_PLAYER;
+    return playerId;
+}
+
 void player_input_system(ECS *ecs, int entityId){
     if (!ecs->velocities.active[entityId]) return;
 
