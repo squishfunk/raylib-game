@@ -30,7 +30,7 @@ int main(void)
         float currentTime = GetTime();
 
         player_input_system(&ecs, playerId);
-        shooting_system(&ecs, playerId, currentTime, &lastShootTime);
+        player_shooting_system(&ecs, playerId, currentTime, &lastShootTime);
         enemy_spawn_system(&ecs);
         enemy_movement_system(&ecs);
         movement_system(&ecs);

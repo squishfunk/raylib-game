@@ -8,9 +8,9 @@
 #define SCREEN_HEIGHT 650 
 
 #define MAX_ENTITIES 1024 /*  TODO */
-#define MOVEMENT_SPEED 5
+#define MOVEMENT_SPEED 200
 #define SHOOT_COOLDOWN 0.25f
-#define BULLET_SPEED 10
+#define BULLET_SPEED 200
 #define BULLET_RADIUS 5
 
 #define SPAWN_COOLDOWN 2
@@ -114,7 +114,7 @@ void collision_system(ECS *ecs);
 void health_system(ECS *ecs);
 
 /*  Shooting */
-void shooting_system(ECS *ecs, int playerId, float currentTime, float *lastShootTime);
+void player_shooting_system(ECS *ecs, int playerId, float currentTime, float *lastShootTime);
 void bullet_system(ECS *ecs);
 
 /* Enemies */
