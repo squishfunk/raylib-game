@@ -13,7 +13,7 @@ typedef enum {
     GAME_STATE_GAME_OVER
 } GameState;
 
-typedef struct {
+typedef struct Game {
     GameState currentState;
     ECS ecs;
     int playerId;

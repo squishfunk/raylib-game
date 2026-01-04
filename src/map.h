@@ -3,9 +3,12 @@
 
 #include <raylib.h>
 #include <stdbool.h>
+#include "ecs.h"
 
 #define MAP_WIDTH 5
 #define MAP_HEIGHT 5
+
+typedef struct Game Game;
 
 typedef enum {
     ROOM_TYPE_EMPTY,
@@ -29,6 +32,7 @@ typedef struct {
     bool visited;
     bool cleared;
     DoorFlags doors;
+    
     int gridX, gridY;
 } Room;
 
@@ -44,6 +48,6 @@ void map_generate(Map *map);
 void map_render_minimap(Map *map, int screenX, int screenY);
 void map_render_current_room(Map *map);
 bool map_can_move_to(Map *map, int newX, int newY);
-void map_move_to_room(Map *map, int newX, int newY);
+void map_move_to_room(Game *game, int newX, int newY);
 
 #endif

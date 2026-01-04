@@ -1,5 +1,27 @@
 #include "game.h"
 
+void enter_room_system(Game *game){
+    TransformComponent *playerTransform = ecs_get_transform(&game->ecs, game->playerId);
+    if(playerTransform){
+        if(playerTransform->position.y < 50 && map_can_move_to(&game->map, game->map.currentX, game->map.currentY - 1)){
+            map_move_to_room(game, game->map.currentX, game->map.currentY - 1);
+            
+        }
+        if(playerTransform->position.y > SCREEN_HEIGHT - 50 && map_can_move_to(&game->map, game->map.currentX, game->map.currentY + 1)){
+            map_move_to_room(game, game->map.currentX, game->map.currentY + 1);
+            playerTransform->position.y = 100;  
+        }
+        if(playerTransform->position.x < 50 && map_can_move_to(&game->map, game->map.currentX - 1, game->map.currentY)){
+            map_move_to_room(game, game->map.currentX - 1, game->map.currentY);
+            playerTransform->position.x = SCREEN_WIDTH - 100;  
+        }
+        if(playerTransform->position.x > SCREEN_WIDTH - 50 && map_can_move_to(&game->map, game->map.currentX + 1, game->map.currentY)){
+            map_move_to_room(game, game->map.currentX + 1, game->map.currentY);
+            playerTransform->position.x = 100;  
+        }
+    }
+}
+
 void game_state_playing_update(Game *game){
     float currentTime = GetTime();
     
@@ -8,26 +30,7 @@ void game_state_playing_update(Game *game){
         return;
     }
     
-    TransformComponent *playerTransform = ecs_get_transform(&game->ecs, game->playerId);
-    if(playerTransform){
-        if(playerTransform->position.y < 50 && map_can_move_to(&game->map, game->map.currentX, game->map.currentY - 1)){
-            map_move_to_room(&game->map, game->map.currentX, game->map.currentY - 1);
-            playerTransform->position.y = SCREEN_HEIGHT - 100;  
-        }
-        if(playerTransform->position.y > SCREEN_HEIGHT - 50 && map_can_move_to(&game->map, game->map.currentX, game->map.currentY + 1)){
-            map_move_to_room(&game->map, game->map.currentX, game->map.currentY + 1);
-            playerTransform->position.y = 100;  
-        }
-        if(playerTransform->position.x < 50 && map_can_move_to(&game->map, game->map.currentX - 1, game->map.currentY)){
-            map_move_to_room(&game->map, game->map.currentX - 1, game->map.currentY);
-            playerTransform->position.x = SCREEN_WIDTH - 100;  
-        }
-        if(playerTransform->position.x > SCREEN_WIDTH - 50 && map_can_move_to(&game->map, game->map.currentX + 1, game->map.currentY)){
-            map_move_to_room(&game->map, game->map.currentX + 1, game->map.currentY);
-            playerTransform->position.x = 100;  
-        }
-    }
-    
+    enter_room_system(game);
     player_input_system(&game->ecs, game->playerId);
     player_shooting_system(&game->ecs, game->playerId, currentTime, &game->lastShootTime);
     enemy_spawn_system(&game->ecs);

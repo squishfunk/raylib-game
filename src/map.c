@@ -1,12 +1,13 @@
 #include "map.h"
+#include "game/game.h"
 #include "ecs.h"
+#include "helpers.h"
 #include <string.h>
 
 void map_init(Map *map){
     memset(map, 0, sizeof(Map));
     map->generated = false;
 }
-
 
 static void map_connect_rooms(Map *map, int x1, int y1, int x2, int y2){
     Room *room1 = &map->rooms[y1][x1];
@@ -198,11 +199,28 @@ bool map_can_move_to(Map *map, int newX, int newY){
     return true;
 }
 
-void map_move_to_room(Map *map, int newX, int newY){
-    if(!map_can_move_to(map, newX, newY)) return;
-    
+void map_move_to_room(Game *game, int newX, int newY){
+    if(!map_can_move_to(&game->map, newX, newY)) return;
+
+    Map *map = &game->map;
+    ECS *ecs = &game->ecs;
+    int playerId = get_player_id(ecs);
+
+    TransformComponent *playerTransform = &game->ecs.transforms.data[playerId];
+
+    /*  Reset bullets and enemies */
+    for(int i = 0; i < ecs->entityCount; i++){
+        if(ecs->entities[i].active){
+            if((ecs->entities[i].tags & TAG_BULLET) || (ecs->entities[i].tags & TAG_ENEMY)){
+                ecs->entities[i].active = false;
+            }
+        }
+    }
+
     map->currentX = newX;
     map->currentY = newY;
     map->rooms[newY][newX].visited = true;
+
+    playerTransform->position.y = SCREEN_HEIGHT - 100;  
 }
 
