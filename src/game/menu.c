@@ -8,6 +8,7 @@ void game_state_menu_update(Game *game){
         game->ecs = (ECS){0};
         map_init(&game->map);
         map_generate(&game->map);
+        room_generate(game);
         
         game->playerId = player_create(&game->ecs, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
         game->lastShootTime = 0.0f;

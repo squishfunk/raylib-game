@@ -64,21 +64,26 @@ void ecs_add_health(ECS *ecs, int entityId, int initialHealthPoints, int maxHeal
     ecs->healths.active[entityId] = true;
 }
 
-void ecs_remove_transform(ECS *ecs, int entityId){
-    ecs->transforms.active[entityId] = false;
+void ecs_add_enemy(ECS *ecs, int entityId, EnemyComponent *enemyComponent){
+    ecs->enemies.data[entityId] = *enemyComponent;
+    ecs->enemies.active[entityId] = true;
 }
 
-void ecs_remove_velocity(ECS *ecs, int entityId){
-    ecs->velocities.active[entityId] = false;
-}
+// void ecs_remove_transform(ECS *ecs, int entityId){
+//     ecs->transforms.active[entityId] = false;
+// }
 
-void ecs_remove_renderable(ECS *ecs, int entityId){
-    ecs->renderables.active[entityId] = false;
-}
+// void ecs_remove_velocity(ECS *ecs, int entityId){
+//     ecs->velocities.active[entityId] = false;
+// }
 
-void ecs_remove_health(ECS *ecs, int entityId){
-    ecs->healths.active[entityId] = false;
-}
+// void ecs_remove_renderable(ECS *ecs, int entityId){
+//     ecs->renderables.active[entityId] = false;
+// }
+
+// void ecs_remove_health(ECS *ecs, int entityId){
+//     ecs->healths.active[entityId] = false;
+// }
 
 TransformComponent* ecs_get_transform(ECS *ecs, int entityId){
     if(entityId < 0 || entityId >= ecs->entityCount) return NULL;

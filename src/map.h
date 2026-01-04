@@ -45,6 +45,7 @@ typedef struct {
 
 void map_init(Map *map);
 void map_generate(Map *map);
+void room_generate(Game *game);
 void map_render_minimap(Map *map, int screenX, int screenY);
 void map_render_current_room(Map *map);
 bool map_can_move_to(Map *map, int newX, int newY);

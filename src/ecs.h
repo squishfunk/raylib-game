@@ -8,7 +8,7 @@
 #define SCREEN_HEIGHT 650 
 
 #define MAX_ENTITIES 1024 /*  TODO */
-#define MOVEMENT_SPEED 200
+#define MOVEMENT_SPEED 350
 #define SHOOT_COOLDOWN 0.25f
 #define BULLET_SPEED 200
 #define BULLET_RADIUS 5
@@ -37,6 +37,21 @@ typedef struct {
     int maxHealthPoints;
     float lastDamageTime;
 } HealthComponent;
+
+typedef enum {
+    ENEMY_TYPE_NORMAL,
+    ENEMY_TYPE_FAST,
+    ENEMY_TYPE_TANK,
+    ENEMY_TYPE_BOSS
+} EnemyType;
+
+typedef struct {
+    EnemyType type;
+    float movementSpeed;
+    int damage;
+    float attackCooldown;
+    float lastAttackTime;
+} EnemyComponent;
 
 typedef enum {
     TAG_NONE = 0,
@@ -73,6 +88,11 @@ typedef struct {
 } HealthStorage;
 
 typedef struct {
+    EnemyComponent data[MAX_ENTITIES];
+    bool active[MAX_ENTITIES];
+} EnemyStorage;
+
+typedef struct {
     Entity entities[MAX_ENTITIES];
     int entityCount;
     
@@ -80,7 +100,19 @@ typedef struct {
     VelocityStorage velocities;
     RenderableStorage renderables;
     HealthStorage healths;
+    EnemyStorage enemies;
 } ECS;
+
+typedef struct {
+    float radius;
+    Color color;
+    int health;
+    int maxHealth;
+    float movementSpeed;
+    int damage;
+    float attackCooldown;
+} EnemyConfig;
+
 
 /* ECS */
 int ecs_create_entity(ECS *ecs);
@@ -91,13 +123,13 @@ void ecs_add_tranform(ECS *ecs, int entityId, Vector2 position);
 void ecs_add_velocity(ECS *ecs, int entityId, Vector2 velocity);
 void ecs_add_renderable(ECS *ecs, int entityId, float radius, Color color);
 void ecs_add_health(ECS *ecs, int entityId, int initialHealthPoints, int maxHealthPoints);
+void ecs_add_enemy(ECS *ecs, int entityId, EnemyComponent *enemyComponent);
 
 /* Components -  */
-void ecs_remove_transform(ECS *ecs, int entityId);
-void ecs_remove_velocity(ECS *ecs, int entityId);
-void ecs_remove_renderable(ECS *ecs, int entityId);
-void ecs_remove_health(ECS *ecs, int entityId);
-void ecs_remove_damage_cooldown(ECS *ecs, int entityId);
+// void ecs_remove_transform(ECS *ecs, int entityId);
+// void ecs_remove_velocity(ECS *ecs, int entityId);
+// void ecs_remove_renderable(ECS *ecs, int entityId);
+// void ecs_remove_health(ECS *ecs, int entityId);
 
 /* Components - get */
 TransformComponent* ecs_get_transform(ECS *ecs, int entityId);
@@ -119,7 +151,8 @@ void player_shooting_system(ECS *ecs, int playerId, float currentTime, float *la
 void bullet_system(ECS *ecs);
 
 /* Enemies */
-void enemy_spawn_system(ECS *ecs);
 void enemy_movement_system(ECS *ecs);
+int enemy_create(ECS *ecs, Vector2 position, EnemyType type);
+
 
 #endif

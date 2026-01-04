@@ -199,6 +199,22 @@ bool map_can_move_to(Map *map, int newX, int newY){
     return true;
 }
 
+void room_generate(Game *game){
+
+    ECS *ecs = &game->ecs;
+
+    int enemiesCount = 3;
+
+    for (int i = 0; i < enemiesCount; i++){
+        EnemyType randomEnemyType = GetRandomValue(0, sizeof(EnemyType) - 1); /*  Tutaj zmienić na random  */
+
+        float randomX = (float)GetRandomValue(0, SCREEN_WIDTH);
+        float randomY = (float)GetRandomValue(0, SCREEN_HEIGHT);
+
+        enemy_create(ecs, (Vector2){randomX, randomY}, randomEnemyType);
+    }
+}
+
 void map_move_to_room(Game *game, int newX, int newY){
     if(!map_can_move_to(&game->map, newX, newY)) return;
 
@@ -217,10 +233,14 @@ void map_move_to_room(Game *game, int newX, int newY){
         }
     }
 
+    /*  NEW ROOM */
+    if(!map->rooms[newY][newX].visited){
+        /*  SPAWN ENEMIES */
+        room_generate(game);
+    }
+
     map->currentX = newX;
     map->currentY = newY;
     map->rooms[newY][newX].visited = true;
-
-    playerTransform->position.y = SCREEN_HEIGHT - 100;  
 }
 

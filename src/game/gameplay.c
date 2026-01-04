@@ -5,7 +5,7 @@ void enter_room_system(Game *game){
     if(playerTransform){
         if(playerTransform->position.y < 50 && map_can_move_to(&game->map, game->map.currentX, game->map.currentY - 1)){
             map_move_to_room(game, game->map.currentX, game->map.currentY - 1);
-            
+            playerTransform->position.y = SCREEN_HEIGHT - 100;
         }
         if(playerTransform->position.y > SCREEN_HEIGHT - 50 && map_can_move_to(&game->map, game->map.currentX, game->map.currentY + 1)){
             map_move_to_room(game, game->map.currentX, game->map.currentY + 1);
@@ -20,6 +20,7 @@ void enter_room_system(Game *game){
             playerTransform->position.x = 100;  
         }
     }
+
 }
 
 void game_state_playing_update(Game *game){
@@ -33,7 +34,6 @@ void game_state_playing_update(Game *game){
     enter_room_system(game);
     player_input_system(&game->ecs, game->playerId);
     player_shooting_system(&game->ecs, game->playerId, currentTime, &game->lastShootTime);
-    enemy_spawn_system(&game->ecs);
     enemy_movement_system(&game->ecs);
     movement_system(&game->ecs);
     collision_system(&game->ecs);

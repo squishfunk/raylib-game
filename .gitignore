@@ -1,6 +1,7 @@
 main
 *.exe
 *.out
+/resources/
 
 *.o
 *.obj
