@@ -47,7 +47,7 @@ const EnemyConfig EnemySystem::ENEMY_CONFIGS[] = {
     }
 };
 
-int EnemySystem::createEnemy(ECS& ecs, Vector2 position, EnemyType type) {
+int EnemySystem::createEnemy(ECS& ecs, Vector2 position, EnemyType type, int screenWidth, int screenHeight) {
     int enemyId = ecs.createEntity();
     if (enemyId < 0) return -1;
     
@@ -55,9 +55,9 @@ int EnemySystem::createEnemy(ECS& ecs, Vector2 position, EnemyType type) {
     const EnemyConfig* config = &ENEMY_CONFIGS[typeIndex];
     
     // Fix position depending on radius
-    position.x = (position.x + config->radius > SCREEN_WIDTH) ? SCREEN_WIDTH - config->radius : position.x;
+    position.x = (position.x + config->radius > screenWidth) ? screenWidth - config->radius : position.x;
     position.x = (position.x - config->radius < 0) ? config->radius : position.x;
-    position.y = (position.y + config->radius > SCREEN_HEIGHT) ? SCREEN_HEIGHT - config->radius : position.y;
+    position.y = (position.y + config->radius > screenHeight) ? screenHeight - config->radius : position.y;
     position.y = (position.y - config->radius < 0) ? config->radius : position.y;
     
     ecs.addTransform(enemyId, position);
@@ -79,6 +79,18 @@ int EnemySystem::createEnemy(ECS& ecs, Vector2 position, EnemyType type) {
     return enemyId;
 }
 
+void EnemySystem::generateRoomEnemies(ECS& ecs, int screenWidth, int screenHeight) {
+    int enemiesCount = 3;
+    
+    for (int i = 0; i < enemiesCount; i++) {
+        EnemyType randomEnemyType = static_cast<EnemyType>(GetRandomValue(0, 3));
+        
+        float randomX = static_cast<float>(GetRandomValue(0, screenWidth));
+        float randomY = static_cast<float>(GetRandomValue(0, screenHeight));
+        
+        createEnemy(ecs, Vector2{randomX, randomY}, randomEnemyType, screenWidth, screenHeight);
+    }
+}
 void EnemySystem::updateMovement(ECS& ecs) {
     const auto& entities = ecs.getEntities();
     int entityCount = ecs.getEntityCount();

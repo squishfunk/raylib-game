@@ -13,7 +13,7 @@ void RenderSystem::renderHealthbar(const ECS& ecs, int entityId) {
     const auto& health = healths.get(entityId);
     
     int width = static_cast<int>(renderable.radius * 2.5f);
-    int height = SCREEN_WIDTH / 100;
+    int height = 10;
     
     int x = static_cast<int>(transform.position.x - width / 2.0f);
     int y = static_cast<int>(transform.position.y + renderable.radius * 1.5f);

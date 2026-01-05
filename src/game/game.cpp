@@ -11,18 +11,12 @@
 #include <raylib.h>
 #include <cstdio>
 
-Game::Game() : currentState(GameState::MENU), playerId(-1), lastShootTime(0.0f) {
-}
-
-Game::~Game() {
-}
-
-void Game::init() {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, GAME_NAME);
+Game::Game(int screenWidth, int screenHeight, const std::string &gameName) : screenWidth(screenWidth), screenHeight(screenHeight), currentState(GameState::MENU), playerId(-1), lastShootTime(0.0f) {
+    InitWindow(screenWidth, screenHeight, gameName.c_str());
     SetTargetFPS(60);
 }
 
-void Game::cleanup() {
+Game::~Game() {
     CloseWindow();
 }
 
@@ -70,9 +64,9 @@ void Game::updateMenu() {
         
         map.init();
         map.generate();
-        Map::generateRoom(*this);
+        EnemySystem::generateRoomEnemies(ecs, screenWidth, screenHeight);
         
-        playerId = PlayerSystem::createPlayer(ecs, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+        playerId = PlayerSystem::createPlayer(ecs, this->screenWidth / 2, this->screenHeight / 2);
         lastShootTime = 0.0f;
     }
     
@@ -85,23 +79,23 @@ void Game::renderMenu() const {
     ClearBackground(DARKBLUE);
     
     char title[100];
-    snprintf(title, sizeof(title), "%s GAME", GAME_NAME);
+    snprintf(title, sizeof(title), "%s GAME", this->gameName.c_str());
     
     int titleSize = 60;
-    int titleX = SCREEN_WIDTH/2 - MeasureText(title, titleSize)/2;
-    int titleY = SCREEN_HEIGHT/2 - 100;
+    int titleX = this->screenWidth / 2 - MeasureText(title, titleSize)/2;
+    int titleY = this->screenHeight / 2 - 100;
     DrawText(title, titleX, titleY, titleSize, WHITE);
     
     const char *instruction = "Press ENTER to start";
     int instSize = 30;
-    int instX = SCREEN_WIDTH/2 - MeasureText(instruction, instSize)/2;
-    int instY = SCREEN_HEIGHT/2 + 50;
+    int instX = this->screenWidth / 2 - MeasureText(instruction, instSize)/2;
+    int instY = this->screenHeight / 2 + 50;
     DrawText(instruction, instX, instY, instSize, LIGHTGRAY);
     
     const char *exit = "Press ESC to exit";
     int exitSize = 20;
-    int exitX = SCREEN_WIDTH/2 - MeasureText(exit, exitSize)/2;
-    int exitY = SCREEN_HEIGHT/2 + 100;
+    int exitX = this->screenWidth / 2 - MeasureText(exit, exitSize)/2;
+    int exitY = this->screenHeight / 2 + 100;
     DrawText(exit, exitX, exitY, exitSize, GRAY);
 }
 
@@ -114,17 +108,17 @@ void Game::enterRoomSystem() {
     
     if (playerTransform->position.y < 50 && map.canMoveTo(currentX, currentY - 1)) {
         map.moveToRoom(*this, currentX, currentY - 1);
-        playerTransform->position.y = SCREEN_HEIGHT - 100;
+        playerTransform->position.y = this->screenHeight - 100;
     }
-    if (playerTransform->position.y > SCREEN_HEIGHT - 50 && map.canMoveTo(currentX, currentY + 1)) {
+    if (playerTransform->position.y > this->screenHeight - 50 && map.canMoveTo(currentX, currentY + 1)) {
         map.moveToRoom(*this, currentX, currentY + 1);
         playerTransform->position.y = 100;
     }
     if (playerTransform->position.x < 50 && map.canMoveTo(currentX - 1, currentY)) {
         map.moveToRoom(*this, currentX - 1, currentY);
-        playerTransform->position.x = SCREEN_WIDTH - 100;
+        playerTransform->position.x = this->screenWidth - 100;
     }
-    if (playerTransform->position.x > SCREEN_WIDTH - 50 && map.canMoveTo(currentX + 1, currentY)) {
+    if (playerTransform->position.x > this->screenWidth - 50 && map.canMoveTo(currentX + 1, currentY)) {
         map.moveToRoom(*this, currentX + 1, currentY);
         playerTransform->position.x = 100;
     }
@@ -141,6 +135,7 @@ void Game::updatePlaying() {
     enterRoomSystem();
     PlayerSystem::handleInput(ecs, playerId);
     PlayerSystem::handleShooting(ecs, playerId, currentTime, lastShootTime);
+    BulletSystem::update(ecs, screenHeight, screenWidth);
     EnemySystem::updateMovement(ecs);
     MovementSystem::update(ecs);
     CollisionSystem::update(ecs);
@@ -156,7 +151,7 @@ void Game::updatePlaying() {
 void Game::renderPlaying() const {
     ClearBackground(RAYWHITE);
     
-    map.renderCurrentRoom();
+    map.renderCurrentRoom(this->screenWidth, this->screenHeight);
     
     RenderSystem::render(ecs);
     
@@ -176,18 +171,18 @@ void Game::renderPaused() const {
     ClearBackground((Color){200, 200, 200, 255});
     RenderSystem::render(ecs);
     
-    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){0, 0, 0, 150});
+    DrawRectangle(0, 0, this->screenWidth, this->screenHeight, (Color){0, 0, 0, 150});
     
     const char *text = "PAUSED";
     int size = 60;
-    int x = SCREEN_WIDTH/2 - MeasureText(text, size)/2;
-    int y = SCREEN_HEIGHT/2 - 50;
+    int x = this->screenWidth/2 - MeasureText(text, size)/2;
+    int y = this->screenHeight/2 - 50;
     DrawText(text, x, y, size, WHITE);
     
     const char *resume = "Press ESC to resume";
     int resumeSize = 30;
-    int resumeX = SCREEN_WIDTH/2 - MeasureText(resume, resumeSize)/2;
-    int resumeY = SCREEN_HEIGHT/2 + 50;
+    int resumeX = this->screenWidth/2 - MeasureText(resume, resumeSize)/2;
+    int resumeY = this->screenHeight/2 + 50;
     DrawText(resume, resumeX, resumeY, resumeSize, LIGHTGRAY);
 }
 
@@ -205,13 +200,13 @@ void Game::renderGameOver() const {
     
     const char *text = "GAME OVER";
     int size = 60;
-    int x = SCREEN_WIDTH/2 - MeasureText(text, size)/2;
-    int y = SCREEN_HEIGHT/2 - 50;
+    int x = this->screenWidth/2 - MeasureText(text, size)/2;
+    int y = this->screenHeight/2 - 50;
     DrawText(text, x, y, size, WHITE);
     
     const char *restart = "Press ENTER to return to menu";
     int restartSize = 30;
-    int restartX = SCREEN_WIDTH/2 - MeasureText(restart, restartSize)/2;
-    int restartY = SCREEN_HEIGHT/2 + 50;
+    int restartX = this->screenWidth/2 - MeasureText(restart, restartSize)/2;
+    int restartY = this->screenHeight/2 + 50;
     DrawText(restart, restartX, restartY, restartSize, LIGHTGRAY);
 }

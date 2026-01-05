@@ -5,7 +5,7 @@ class ECS;
 
 class BulletSystem {
 public:
-    static void update(ECS& ecs);
+    static void update(ECS& ecs, int screenWidth, int screenHeight);
 };
 
 #endif // BULLET_SYSTEM_HPP

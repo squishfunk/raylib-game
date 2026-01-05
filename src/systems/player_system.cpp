@@ -40,9 +40,7 @@ void PlayerSystem::handleInput(ECS& ecs, int entityId) {
     }
 }
 
-void PlayerSystem::handleShooting(ECS& ecs, int playerId, float currentTime, float& lastShootTime) {
-    BulletSystem::update(ecs);
-    
+void PlayerSystem::handleShooting(ECS& ecs, int playerId, float currentTime, float& lastShootTime) {    
     if (!(IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) || 
           IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT))) return;
     

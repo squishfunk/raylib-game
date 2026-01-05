@@ -3,8 +3,8 @@
 
 #include "../ecs/ecs.hpp"
 #include "../map/map.hpp"
+#include <string>
 
-constexpr const char* GAME_NAME = "GOWNO";
 
 enum class GameState {
     MENU,
@@ -15,9 +15,14 @@ enum class GameState {
 
 class Game {
 private:
+    int screenWidth;
+    int screenHeight;
+    std::string gameName;
+
     GameState currentState;
     ECS ecs;
     int playerId;
+    
     float lastShootTime;
     Map map;
     
@@ -34,7 +39,7 @@ private:
     void enterRoomSystem();
     
 public:
-    Game();
+    Game(int screenWidth, int screenHeight, const std::string &gameName);
     ~Game();
     
     void init();

@@ -169,34 +169,34 @@ void Map::renderMinimap(int screenX, int screenY) const {
     }
 }
 
-void Map::renderCurrentRoom() const {
+void Map::renderCurrentRoom(int screenWidth, int screenHeight) const {
     const Room& room = rooms[currentY][currentX];
     
     int wallThickness = 20;
     Color color = (room.cleared) ? BROWN : BLACK;
     
     if ((room.doors & DoorFlags::UP) != DoorFlags::UP) {
-        DrawRectangle(0, 0, SCREEN_WIDTH, wallThickness, DARKGRAY);
+        DrawRectangle(0, 0, screenWidth, wallThickness, DARKGRAY);
     } else {
-        DrawRectangle(SCREEN_WIDTH/2 - 50, 0, 100, wallThickness, color);
+        DrawRectangle(screenWidth/2 - 50, 0, 100, wallThickness, color);
     }
     
     if ((room.doors & DoorFlags::DOWN) != DoorFlags::DOWN) {
-        DrawRectangle(0, SCREEN_HEIGHT - wallThickness, SCREEN_WIDTH, wallThickness, DARKGRAY);
+        DrawRectangle(0, screenHeight - wallThickness, screenWidth, wallThickness, DARKGRAY);
     } else {
-        DrawRectangle(SCREEN_WIDTH/2 - 50, SCREEN_HEIGHT - wallThickness, 100, wallThickness, color);
+        DrawRectangle(screenWidth/2 - 50, screenHeight - wallThickness, 100, wallThickness, color);
     }
     
     if ((room.doors & DoorFlags::LEFT) != DoorFlags::LEFT) {
-        DrawRectangle(0, 0, wallThickness, SCREEN_HEIGHT, DARKGRAY);
+        DrawRectangle(0, 0, wallThickness, screenHeight, DARKGRAY);
     } else {
-        DrawRectangle(0, SCREEN_HEIGHT/2 - 50, wallThickness, 100, color);
+        DrawRectangle(0, screenHeight/2 - 50, wallThickness, 100, color);
     }
     
     if ((room.doors & DoorFlags::RIGHT) != DoorFlags::RIGHT) {
-        DrawRectangle(SCREEN_WIDTH - wallThickness, 0, wallThickness, SCREEN_HEIGHT, DARKGRAY);
+        DrawRectangle(screenWidth - wallThickness, 0, wallThickness, screenHeight, DARKGRAY);
     } else {
-        DrawRectangle(SCREEN_WIDTH - wallThickness, SCREEN_HEIGHT/2 - 50, wallThickness, 100, color);
+        DrawRectangle(screenWidth - wallThickness, screenHeight/2 - 50, wallThickness, 100, color);
     }
 }
 
@@ -240,28 +240,9 @@ void Map::moveToRoom(Game& game, int newX, int newY) {
         }
     }
     
-    if (!rooms[newY][newX].visited) {
-        generateRoom(game);
-    }
-    
     currentX = newX;
     currentY = newY;
     rooms[newY][newX].visited = true;
-}
-
-void Map::generateRoom(Game& game) {
-    ECS& ecs = game.getECS();
-    
-    int enemiesCount = 3;
-    
-    for (int i = 0; i < enemiesCount; i++) {
-        EnemyType randomEnemyType = static_cast<EnemyType>(GetRandomValue(0, 3));
-        
-        float randomX = static_cast<float>(GetRandomValue(0, SCREEN_WIDTH));
-        float randomY = static_cast<float>(GetRandomValue(0, SCREEN_HEIGHT));
-        
-        EnemySystem::createEnemy(ecs, Vector2{randomX, randomY}, randomEnemyType);
-    }
 }
 
 void Map::checkRoomCleared(Game& game) {

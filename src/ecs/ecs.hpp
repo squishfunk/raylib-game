@@ -3,7 +3,6 @@
 
 #include "../components/components.hpp"
 #include <array>
-#include <cstdint>
 
 class Game;
 

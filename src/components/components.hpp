@@ -4,8 +4,7 @@
 #include <raylib.h>
 #include <cstdint>
 
-constexpr int SCREEN_WIDTH = 1000;
-constexpr int SCREEN_HEIGHT = 650;
+
 constexpr int MAX_ENTITIES = 1024;
 constexpr float MOVEMENT_SPEED = 350.0f;
 constexpr float SHOOT_COOLDOWN = 0.25f;

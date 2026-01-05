@@ -65,7 +65,7 @@ public:
     void init();
     void generate();
     void renderMinimap(int screenX, int screenY) const;
-    void renderCurrentRoom() const;
+    void renderCurrentRoom(int screenWidth, int screenHeight) const;
     bool canMoveTo(int newX, int newY) const;
     void moveToRoom(Game& game, int newX, int newY);
     

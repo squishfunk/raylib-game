@@ -5,7 +5,7 @@
 #include <raylib.h>
 #include <cstdio>
 
-void BulletSystem::update(ECS& ecs) {
+void BulletSystem::update(ECS& ecs, int screenWidth, int screenHeight) {
     const auto& entities = ecs.getEntities();
     int entityCount = ecs.getEntityCount();
     const auto& transforms = ecs.getTransforms();
@@ -22,8 +22,8 @@ void BulletSystem::update(ECS& ecs) {
         
         Vector2 pos = bulletTransform.position;
         
-        if (pos.x < 0 || pos.x > SCREEN_WIDTH || 
-            pos.y < 0 || pos.y > SCREEN_HEIGHT) {
+        if (pos.x < 0 || pos.x > screenWidth || 
+            pos.y < 0 || pos.y > screenHeight) {
         }
         
         for (int j = 0; j < entityCount; j++) {
