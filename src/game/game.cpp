@@ -10,7 +10,6 @@
 #include "../map/map.hpp"
 #include <raylib.h>
 #include <cstdio>
-#include <cstring>
 
 Game::Game() : currentState(GameState::MENU), playerId(-1), lastShootTime(0.0f) {
 }
@@ -67,15 +66,12 @@ void Game::updateMenu() {
     if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
         currentState = GameState::PLAYING;
         
-        // Reset ECS
         ecs = ECS();
         
-        // Initialize map
         map.init();
         map.generate();
         Map::generateRoom(*this);
         
-        // Create player
         playerId = PlayerSystem::createPlayer(ecs, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
         lastShootTime = 0.0f;
     }

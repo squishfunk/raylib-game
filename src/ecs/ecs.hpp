@@ -5,10 +5,8 @@
 #include <array>
 #include <cstdint>
 
-// Forward declaration
 class Game;
 
-// Entity structure
 struct Entity {
     bool active;
     EntityTag tags;
@@ -16,7 +14,6 @@ struct Entity {
     Entity() : active(false), tags(EntityTag::NONE) {}
 };
 
-// Template for component storage
 template<typename T>
 class ComponentStorage {
 private:
@@ -64,7 +61,6 @@ public:
     }
 };
 
-// ECS class
 class ECS {
 private:
     std::array<Entity, MAX_ENTITIES> entities;
@@ -81,36 +77,29 @@ public:
         entities.fill(Entity());
     }
     
-    // Entity management
     int createEntity();
     void destroyEntity(int entityId);
     
-    // Component management - Transform
     void addTransform(int entityId, Vector2 position);
     TransformComponent* getTransform(int entityId);
     const TransformComponent* getTransform(int entityId) const;
     
-    // Component management - Velocity
     void addVelocity(int entityId, Vector2 velocity);
     VelocityComponent* getVelocity(int entityId);
     const VelocityComponent* getVelocity(int entityId) const;
     
-    // Component management - Renderable
     void addRenderable(int entityId, float radius, Color color);
     RenderableComponent* getRenderable(int entityId);
     const RenderableComponent* getRenderable(int entityId) const;
     
-    // Component management - Health
     void addHealth(int entityId, int initialHealthPoints, int maxHealthPoints);
     HealthComponent* getHealth(int entityId);
     const HealthComponent* getHealth(int entityId) const;
     
-    // Component management - Enemy
     void addEnemy(int entityId, const EnemyComponent& enemyComponent);
     EnemyComponent* getEnemy(int entityId);
     const EnemyComponent* getEnemy(int entityId) const;
     
-    // Getters for internal storage (needed for systems)
     const std::array<Entity, MAX_ENTITIES>& getEntities() const { return entities; }
     std::array<Entity, MAX_ENTITIES>& getEntities() { return entities; }
     int getEntityCount() const { return entityCount; }

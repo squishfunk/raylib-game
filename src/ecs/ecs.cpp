@@ -1,7 +1,6 @@
 #include "ecs.hpp"
 
 int ECS::createEntity() {
-    // Try to find a free slot
     for (int i = 0; i < entityCount; i++) {
         if (!entities[i].active) {
             entities[i] = Entity();
@@ -16,7 +15,6 @@ int ECS::createEntity() {
         }
     }
     
-    // If no free slot and we haven't reached max, create new
     if (entityCount >= MAX_ENTITIES) {
         return -1;
     }

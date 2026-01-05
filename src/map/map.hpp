@@ -4,7 +4,6 @@
 #include <raylib.h>
 #include <cstdint>
 
-// Forward declaration
 class Game;
 
 constexpr int MAP_WIDTH = 5;
@@ -27,7 +26,6 @@ enum class DoorFlags : uint8_t {
     RIGHT = 1 << 3
 };
 
-// Bitwise operators for DoorFlags
 inline DoorFlags operator|(DoorFlags a, DoorFlags b) {
     return static_cast<DoorFlags>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
 }
@@ -71,14 +69,12 @@ public:
     bool canMoveTo(int newX, int newY) const;
     void moveToRoom(Game& game, int newX, int newY);
     
-    // Getters
     int getCurrentX() const { return currentX; }
     int getCurrentY() const { return currentY; }
     const Room& getRoom(int x, int y) const { return rooms[y][x]; }
     Room& getRoom(int x, int y) { return rooms[y][x]; }
     bool isGenerated() const { return generated; }
     
-    // Room generation (needs Game reference)
     static void generateRoom(Game& game);
     static void checkRoomCleared(Game& game);
 };

@@ -227,7 +227,6 @@ void Map::moveToRoom(Game& game, int newX, int newY) {
     auto* playerTransform = ecs.getTransform(playerId);
     if (!playerTransform) return;
     
-    // Reset bullets and enemies
     const auto& entities = ecs.getEntities();
     int entityCount = ecs.getEntityCount();
     
@@ -241,9 +240,7 @@ void Map::moveToRoom(Game& game, int newX, int newY) {
         }
     }
     
-    // NEW ROOM
     if (!rooms[newY][newX].visited) {
-        // SPAWN ENEMIES
         generateRoom(game);
     }
     

@@ -22,13 +22,10 @@ void BulletSystem::update(ECS& ecs) {
         
         Vector2 pos = bulletTransform.position;
         
-        // Check bounds (bullets are removed when out of bounds)
         if (pos.x < 0 || pos.x > SCREEN_WIDTH || 
             pos.y < 0 || pos.y > SCREEN_HEIGHT) {
-            // Bullet out of bounds - will be cleaned up
         }
         
-        // Check collision with enemies
         for (int j = 0; j < entityCount; j++) {
             if (i == j) continue;
             if (!entities[j].active) continue;
