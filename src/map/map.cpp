@@ -62,6 +62,7 @@ void Map::generate() {
     rooms[currentY][currentX].gridY = currentY;
     rooms[currentY][currentX].visited = true;
     rooms[currentY][currentX].cleared = false;
+    rooms[currentY][currentX].bounds = Rectangle{0, 0, 1000.0f, 650.0f}; 
     
     for (int i = 1; i < pathLength; i++) {
         int directions[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
@@ -90,6 +91,7 @@ void Map::generate() {
             }
             rooms[currentY][currentX].gridX = currentX;
             rooms[currentY][currentX].gridY = currentY;
+            rooms[currentY][currentX].bounds = Rectangle{0, 0, 1000.0f, 650.0f}; 
         }
     }
     

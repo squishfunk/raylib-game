@@ -3,6 +3,7 @@
 
 #include "../ecs/ecs.hpp"
 #include "../map/map.hpp"
+#include "../map/dungeon.hpp"
 #include <string>
 
 
@@ -22,6 +23,7 @@ private:
     GameState currentState;
     ECS ecs;
     int playerId;
+    Dungeon *dungeonManager;
     
     Map map;
     

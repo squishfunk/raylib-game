@@ -17,6 +17,10 @@ SOURCES = $(SRCDIR)/main.cpp \
           $(SRCDIR)/systems/door_system.cpp \
           $(SRCDIR)/systems/room_system.cpp \
           $(SRCDIR)/game/game.cpp \
+          $(SRCDIR)/map/dungeon.cpp \
+          $(SRCDIR)/factories/door_factory.cpp \
+          $(SRCDIR)/factories/enemy_factory.cpp \
+          $(SRCDIR)/factories/player_factory.cpp \
           $(SRCDIR)/utils/helpers.cpp
 
 OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)

@@ -3,6 +3,9 @@
 
 #include <raylib.h>
 #include <cstdint>
+#include <vector>
+#include "../components/components.hpp"
+
 
 class Game;
 
@@ -39,15 +42,24 @@ inline DoorFlags& operator|=(DoorFlags& a, DoorFlags b) {
     return a;
 }
 
+struct EnemySpawn {
+    Vector2 position;
+    EnemyType type;
+    
+    EnemySpawn(Vector2 pos, EnemyType t) : position(pos), type(t) {}
+};
+
 struct Room {
     RoomType type;
     bool visited;
     bool cleared;
     DoorFlags doors;
     int gridX, gridY;
+    Rectangle bounds;
+    std::vector<EnemySpawn> enemySpawns;
     
     Room() : type(RoomType::EMPTY), visited(false), cleared(false), 
-             doors(DoorFlags::NONE), gridX(0), gridY(0) {}
+             doors(DoorFlags::NONE), gridX(0), gridY(0), bounds{0, 0, 0, 0} {}
 };
 
 class Map {
@@ -68,6 +80,9 @@ public:
     // void renderCurrentRoom(int screenWidth, int screenHeight) const;
     bool canMoveTo(int newX, int newY) const;
     void moveToRoom(Game& game, int newX, int newY);
+
+    int getStartX() const { return startX; }
+    int getStartY() const { return startY; }
     
     int getCurrentX() const { return currentX; }
     int getCurrentY() const { return currentY; }

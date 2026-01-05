@@ -8,20 +8,44 @@
 #include "../systems/bullet_system.hpp"
 #include "../systems/room_system.hpp"
 #include "../systems/door_system.hpp"
+#include "../factories/player_factory.hpp"
 #include "../map/map.hpp"
+#include "../map/dungeon.hpp"
+#include <cassert>
 #include <raylib.h>
 #include <cstdio>
 
-Game::Game(int screenWidth, int screenHeight, const std::string &gameName) : screenWidth(screenWidth), screenHeight(screenHeight), currentState(GameState::MENU), playerId(-1) {
+Game::Game(int screenWidth, int screenHeight, const std::string &gameName) : 
+screenWidth(screenWidth), 
+screenHeight(screenHeight), 
+currentState(GameState::MENU), 
+playerId(-1),
+dungeonManager(nullptr)
+{
     InitWindow(screenWidth, screenHeight, gameName.c_str());
+
+    if (!IsWindowReady()) {
+        fprintf(stderr, "Error: Failed to initialize window. Check DISPLAY variable.\n");
+        return;
+    }
+
     SetTargetFPS(60);
 }
 
 Game::~Game() {
-    CloseWindow();
+    delete dungeonManager;
+
+    if (IsWindowReady()) {
+        CloseWindow();
+    }
 }
 
 void Game::run() {
+    if (!IsWindowReady()) {
+        fprintf(stderr, "Error: Window not ready. Cannot run game.\n");
+        return;
+    }
+
     while (!WindowShouldClose()) {
         switch (currentState) {
             case GameState::MENU:
@@ -97,16 +121,21 @@ void Game::initGame(){
     map.init();
     map.generate();
 
-    playerId = PlayerSystem::createPlayer(ecs, this->screenWidth / 2, this->screenHeight / 2);
+    playerId = PlayerFactory::create(ecs, {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)});
 
-    RoomSystem::initRoom(ecs, screenWidth, screenHeight);    
+    int startX = map.getStartX();
+    int startY = map.getStartY();
+
+    const Room& startRoom = map.getRoom(startX, startY);
+    assert(startRoom.type == RoomType::START && "Error: Start room is EMPTY!");
+
+    dungeonManager = new Dungeon(ecs, map, playerId);
+    dungeonManager->loadRoom(startRoom, DoorFlags::NONE);
 
     currentState = GameState::PLAYING;
 }
 
 void Game::updatePlaying() {
-    float currentTime = GetTime();
-    
     if (IsKeyPressed(KEY_ESCAPE)) {
         currentState = GameState::PAUSED;
         return;
