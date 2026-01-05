@@ -169,36 +169,36 @@ void Map::renderMinimap(int screenX, int screenY) const {
     }
 }
 
-void Map::renderCurrentRoom(int screenWidth, int screenHeight) const {
-    const Room& room = rooms[currentY][currentX];
+// void Map::renderCurrentRoom(int screenWidth, int screenHeight) const {
+//     const Room& room = rooms[currentY][currentX];
     
-    int wallThickness = 20;
-    Color color = (room.cleared) ? BROWN : BLACK;
+//     int wallThickness = 20;
+//     Color color = (room.cleared) ? BROWN : BLACK;
     
-    if ((room.doors & DoorFlags::UP) != DoorFlags::UP) {
-        DrawRectangle(0, 0, screenWidth, wallThickness, DARKGRAY);
-    } else {
-        DrawRectangle(screenWidth/2 - 50, 0, 100, wallThickness, color);
-    }
+//     if ((room.doors & DoorFlags::UP) != DoorFlags::UP) {
+//         DrawRectangle(0, 0, screenWidth, wallThickness, DARKGRAY);
+//     } else {
+//         DrawRectangle(screenWidth/2 - 50, 0, 100, wallThickness, color);
+//     }
     
-    if ((room.doors & DoorFlags::DOWN) != DoorFlags::DOWN) {
-        DrawRectangle(0, screenHeight - wallThickness, screenWidth, wallThickness, DARKGRAY);
-    } else {
-        DrawRectangle(screenWidth/2 - 50, screenHeight - wallThickness, 100, wallThickness, color);
-    }
+//     if ((room.doors & DoorFlags::DOWN) != DoorFlags::DOWN) {
+//         DrawRectangle(0, screenHeight - wallThickness, screenWidth, wallThickness, DARKGRAY);
+//     } else {
+//         DrawRectangle(screenWidth/2 - 50, screenHeight - wallThickness, 100, wallThickness, color);
+//     }
     
-    if ((room.doors & DoorFlags::LEFT) != DoorFlags::LEFT) {
-        DrawRectangle(0, 0, wallThickness, screenHeight, DARKGRAY);
-    } else {
-        DrawRectangle(0, screenHeight/2 - 50, wallThickness, 100, color);
-    }
+//     if ((room.doors & DoorFlags::LEFT) != DoorFlags::LEFT) {
+//         DrawRectangle(0, 0, wallThickness, screenHeight, DARKGRAY);
+//     } else {
+//         DrawRectangle(0, screenHeight/2 - 50, wallThickness, 100, color);
+//     }
     
-    if ((room.doors & DoorFlags::RIGHT) != DoorFlags::RIGHT) {
-        DrawRectangle(screenWidth - wallThickness, 0, wallThickness, screenHeight, DARKGRAY);
-    } else {
-        DrawRectangle(screenWidth - wallThickness, screenHeight/2 - 50, wallThickness, 100, color);
-    }
-}
+//     if ((room.doors & DoorFlags::RIGHT) != DoorFlags::RIGHT) {
+//         DrawRectangle(screenWidth - wallThickness, 0, wallThickness, screenHeight, DARKGRAY);
+//     } else {
+//         DrawRectangle(screenWidth - wallThickness, screenHeight/2 - 50, wallThickness, 100, color);
+//     }
+// }
 
 bool Map::canMoveTo(int newX, int newY) const {
     if (newX < 0 || newX >= MAP_WIDTH || newY < 0 || newY >= MAP_HEIGHT) return false;

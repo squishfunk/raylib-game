@@ -23,7 +23,6 @@ private:
     ECS ecs;
     int playerId;
     
-    float lastShootTime;
     Map map;
     
     void updateMenu();
@@ -35,16 +34,15 @@ private:
     void renderPlaying() const;
     void renderPaused() const;
     void renderGameOver() const;
+
+    void initGame();
     
-    void enterRoomSystem();
     
 public:
     Game(int screenWidth, int screenHeight, const std::string &gameName);
     ~Game();
     
-    void init();
     void run();
-    void cleanup();
     
     ECS& getECS() { return ecs; }
     const ECS& getECS() const { return ecs; }

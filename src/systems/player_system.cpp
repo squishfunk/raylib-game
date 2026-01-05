@@ -1,7 +1,9 @@
 #include "player_system.hpp"
 #include "../ecs/ecs.hpp"
 #include "../components/components.hpp"
+#include "../utils/helpers.hpp"
 #include "bullet_system.hpp"
+#include <raylib.h>
 #include <raymath.h>
 
 int PlayerSystem::createPlayer(ECS& ecs, int initX, int initY) {
@@ -10,18 +12,27 @@ int PlayerSystem::createPlayer(ECS& ecs, int initX, int initY) {
     ecs.addVelocity(playerId, Vector2{0, 0});
     ecs.addRenderable(playerId, 20.0f, GREEN);
     ecs.addHealth(playerId, 100, 100);
+    ecs.addShootable(playerId, 1000.0f, BULLET_SPEED, SHOOT_COOLDOWN);
     ecs.getEntities()[playerId].tags = EntityTag::PLAYER;
     return playerId;
 }
 
-void PlayerSystem::handleInput(ECS& ecs, int entityId) {
-    if (!ecs.getVelocities().isActive(entityId)) return;
+void PlayerSystem::update(ECS &ecs){
+    int playerId = Helpers::getPlayerId(ecs);
+
+    PlayerSystem::handleInput(ecs, playerId);
+    PlayerSystem::handleShooting(ecs, playerId);
+}
+
+void PlayerSystem::handleInput(ECS& ecs, int playerId) {
     
+    if (!ecs.getVelocities().isActive(playerId)) return;
+
     float deltaTime = GetFrameTime();
     float acceleration = 15.0f;
     float friction = 8.0f;
     
-    auto& velocity = ecs.getVelocities().get(entityId);
+    auto& velocity = ecs.getVelocities().get(playerId);
     Vector2 targetVelocity = {0, 0};
     
     if (IsKeyDown(KEY_W)) targetVelocity.y = -MOVEMENT_SPEED;
@@ -40,21 +51,26 @@ void PlayerSystem::handleInput(ECS& ecs, int entityId) {
     }
 }
 
-void PlayerSystem::handleShooting(ECS& ecs, int playerId, float currentTime, float& lastShootTime) {    
+void PlayerSystem::handleShooting(ECS& ecs, int playerId) {
     if (!(IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) || 
           IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT))) return;
+
+    if (!ecs.getTransforms().isActive(playerId) || !ecs.getShootables().isActive(playerId)) return;
+
+    float currentTime = GetTime();
     
-    if (currentTime - lastShootTime < SHOOT_COOLDOWN) return;
-    if (!ecs.getTransforms().isActive(playerId)) return;
+    auto& shootable = ecs.getShootables().get(playerId);
+    
+    if (currentTime - shootable.lastShootTime < shootable.shootCooldown) return;
     
     const auto& playerTransform = ecs.getTransforms().get(playerId);
     Vector2 position = playerTransform.position;
     Vector2 velocity = {0, 0};
     
-    if (IsKeyDown(KEY_UP)) velocity.y = -BULLET_SPEED;
-    if (IsKeyDown(KEY_DOWN)) velocity.y = BULLET_SPEED;
-    if (IsKeyDown(KEY_LEFT)) velocity.x = -BULLET_SPEED;
-    if (IsKeyDown(KEY_RIGHT)) velocity.x = BULLET_SPEED;
+    if (IsKeyDown(KEY_UP)) velocity.y = -shootable.shootingSpeed;
+    if (IsKeyDown(KEY_DOWN)) velocity.y = shootable.shootingSpeed;
+    if (IsKeyDown(KEY_LEFT)) velocity.x = -shootable.shootingSpeed;
+    if (IsKeyDown(KEY_RIGHT)) velocity.x = shootable.shootingSpeed;
     
     int bulletId = ecs.createEntity();
     if (bulletId >= 0) {
@@ -64,6 +80,6 @@ void PlayerSystem::handleShooting(ECS& ecs, int playerId, float currentTime, flo
         ecs.getEntities()[bulletId].tags = EntityTag::BULLET;
     }
     
-    lastShootTime = currentTime;
+    shootable.lastShootTime = currentTime;
 }
 

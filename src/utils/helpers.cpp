@@ -10,6 +10,22 @@ namespace Helpers {
         return distance < minDistance;
     }
     
+    bool checkCircleRectCollision(Vector2 circlePos, float circleRadius, Vector2 rectPos, float rectWidth, float rectHeight) {
+        float rectLeft = rectPos.x - rectWidth / 2.0f;
+        float rectRight = rectPos.x + rectWidth / 2.0f;
+        float rectTop = rectPos.y - rectHeight / 2.0f;
+        float rectBottom = rectPos.y + rectHeight / 2.0f;
+        
+        float closestX = std::max(rectLeft, std::min(circlePos.x, rectRight));
+        float closestY = std::max(rectTop, std::min(circlePos.y, rectBottom));
+        
+        float dx = circlePos.x - closestX;
+        float dy = circlePos.y - closestY;
+        float distance = std::sqrt(dx * dx + dy * dy);
+        
+        return distance < circleRadius;
+    }
+    
     int getPlayerId(const ECS& ecs) {
         const auto& entities = ecs.getEntities();
         int entityCount = ecs.getEntityCount();

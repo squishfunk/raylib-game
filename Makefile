@@ -3,6 +3,7 @@ CXXFLAGS = -std=c++17 -Wall -Wextra
 LDFLAGS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 SRCDIR = src
+BUILDDIR = build
 SOURCES = $(SRCDIR)/main.cpp \
           $(SRCDIR)/ecs/ecs.cpp \
           $(SRCDIR)/map/map.cpp \
@@ -13,21 +14,30 @@ SOURCES = $(SRCDIR)/main.cpp \
           $(SRCDIR)/systems/collision_system.cpp \
           $(SRCDIR)/systems/player_system.cpp \
           $(SRCDIR)/systems/enemy_system.cpp \
+          $(SRCDIR)/systems/door_system.cpp \
+          $(SRCDIR)/systems/room_system.cpp \
           $(SRCDIR)/game/game.cpp \
           $(SRCDIR)/utils/helpers.cpp
 
-OBJECTS = $(SOURCES:.cpp=.o)
-TARGET = main
+OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
+TARGET = $(BUILDDIR)/main
 
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) | $(BUILDDIR)
 	$(CXX) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
 
-%.o: %.cpp
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp | $(BUILDDIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-clean:
-	rm -f $(OBJECTS) $(TARGET)
+$(BUILDDIR):
+	@mkdir -p $(BUILDDIR)
 
-.PHONY: all clean
+run: $(TARGET)
+	./$(TARGET)
+
+clean:
+	rm -rf $(BUILDDIR)
+
+.PHONY: all clean run

@@ -11,6 +11,8 @@ int ECS::createEntity() {
             renderables.setActive(i, false);
             healths.setActive(i, false);
             enemies.setActive(i, false);
+            doors.setActive(i, false);
+            shootables.setActive(i, false);
             return i;
         }
     }
@@ -28,6 +30,8 @@ int ECS::createEntity() {
     renderables.setActive(entityId, false);
     healths.setActive(entityId, false);
     enemies.setActive(entityId, false);
+    doors.setActive(entityId, false);
+    shootables.setActive(entityId, false);
     
     return entityId;
 }
@@ -42,6 +46,8 @@ void ECS::destroyEntity(int entityId) {
     renderables.setActive(entityId, false);
     healths.setActive(entityId, false);
     enemies.setActive(entityId, false);
+    doors.setActive(entityId, false);
+    shootables.setActive(entityId, false);
 }
 
 void ECS::addTransform(int entityId, Vector2 position) {
@@ -110,5 +116,35 @@ EnemyComponent* ECS::getEnemy(int entityId) {
 
 const EnemyComponent* ECS::getEnemy(int entityId) const {
     return enemies.getPtr(entityId);
+}
+
+void ECS::addDoor(int entityId, float width, float height) {
+    doors.get(entityId).width = width;
+    doors.get(entityId).height = height;
+    doors.setActive(entityId, true);
+}
+
+DoorComponent* ECS::getDoor(int entityId) {
+    return doors.getPtr(entityId);
+}
+
+const DoorComponent* ECS::getDoor(int entityId) const {
+    return doors.getPtr(entityId);
+}
+
+void ECS::addShootable(int entityId, float shootingRange, float shootingSpeed, float shootCooldown) {
+    shootables.get(entityId).lastShootTime = 0.0f;
+    shootables.get(entityId).shootingRange = shootingRange;
+    shootables.get(entityId).shootingSpeed = shootingSpeed;
+    shootables.get(entityId).shootCooldown = shootCooldown;
+    shootables.setActive(entityId, true);
+}
+
+ShootableComponent* ECS::getShootable(int entityId) {
+    return shootables.getPtr(entityId);
+}
+
+const ShootableComponent* ECS::getShootable(int entityId) const {
+    return shootables.getPtr(entityId);
 }
 

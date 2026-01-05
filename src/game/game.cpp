@@ -1,5 +1,4 @@
 #include "game.hpp"
-#include "../components/components.hpp"
 #include "../systems/player_system.hpp"
 #include "../systems/enemy_system.hpp"
 #include "../systems/movement_system.hpp"
@@ -7,11 +6,13 @@
 #include "../systems/health_system.hpp"
 #include "../systems/render_system.hpp"
 #include "../systems/bullet_system.hpp"
+#include "../systems/room_system.hpp"
+#include "../systems/door_system.hpp"
 #include "../map/map.hpp"
 #include <raylib.h>
 #include <cstdio>
 
-Game::Game(int screenWidth, int screenHeight, const std::string &gameName) : screenWidth(screenWidth), screenHeight(screenHeight), currentState(GameState::MENU), playerId(-1), lastShootTime(0.0f) {
+Game::Game(int screenWidth, int screenHeight, const std::string &gameName) : screenWidth(screenWidth), screenHeight(screenHeight), currentState(GameState::MENU), playerId(-1) {
     InitWindow(screenWidth, screenHeight, gameName.c_str());
     SetTargetFPS(60);
 }
@@ -58,16 +59,7 @@ void Game::run() {
 
 void Game::updateMenu() {
     if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
-        currentState = GameState::PLAYING;
-        
-        ecs = ECS();
-        
-        map.init();
-        map.generate();
-        EnemySystem::generateRoomEnemies(ecs, screenWidth, screenHeight);
-        
-        playerId = PlayerSystem::createPlayer(ecs, this->screenWidth / 2, this->screenHeight / 2);
-        lastShootTime = 0.0f;
+        initGame();
     }
     
     if (IsKeyPressed(KEY_ESCAPE)) {
@@ -99,29 +91,17 @@ void Game::renderMenu() const {
     DrawText(exit, exitX, exitY, exitSize, GRAY);
 }
 
-void Game::enterRoomSystem() {
-    auto* playerTransform = ecs.getTransform(playerId);
-    if (!playerTransform) return;
+void Game::initGame(){
+    ecs = ECS();
     
-    int currentX = map.getCurrentX();
-    int currentY = map.getCurrentY();
-    
-    if (playerTransform->position.y < 50 && map.canMoveTo(currentX, currentY - 1)) {
-        map.moveToRoom(*this, currentX, currentY - 1);
-        playerTransform->position.y = this->screenHeight - 100;
-    }
-    if (playerTransform->position.y > this->screenHeight - 50 && map.canMoveTo(currentX, currentY + 1)) {
-        map.moveToRoom(*this, currentX, currentY + 1);
-        playerTransform->position.y = 100;
-    }
-    if (playerTransform->position.x < 50 && map.canMoveTo(currentX - 1, currentY)) {
-        map.moveToRoom(*this, currentX - 1, currentY);
-        playerTransform->position.x = this->screenWidth - 100;
-    }
-    if (playerTransform->position.x > this->screenWidth - 50 && map.canMoveTo(currentX + 1, currentY)) {
-        map.moveToRoom(*this, currentX + 1, currentY);
-        playerTransform->position.x = 100;
-    }
+    map.init();
+    map.generate();
+
+    playerId = PlayerSystem::createPlayer(ecs, this->screenWidth / 2, this->screenHeight / 2);
+
+    RoomSystem::initRoom(ecs, screenWidth, screenHeight);    
+
+    currentState = GameState::PLAYING;
 }
 
 void Game::updatePlaying() {
@@ -132,14 +112,13 @@ void Game::updatePlaying() {
         return;
     }
     
-    enterRoomSystem();
-    PlayerSystem::handleInput(ecs, playerId);
-    PlayerSystem::handleShooting(ecs, playerId, currentTime, lastShootTime);
+    PlayerSystem::update(ecs);
     BulletSystem::update(ecs, screenHeight, screenWidth);
     EnemySystem::updateMovement(ecs);
     MovementSystem::update(ecs);
     CollisionSystem::update(ecs);
     HealthSystem::update(ecs);
+    DoorSystem::update(ecs);
     
     Map::checkRoomCleared(*this);
     
@@ -151,7 +130,7 @@ void Game::updatePlaying() {
 void Game::renderPlaying() const {
     ClearBackground(RAYWHITE);
     
-    map.renderCurrentRoom(this->screenWidth, this->screenHeight);
+    // map.renderCurrentRoom(this->screenWidth, this->screenHeight);
     
     RenderSystem::render(ecs);
     

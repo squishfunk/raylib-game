@@ -1,6 +1,7 @@
 #include "render_system.hpp"
 #include "../ecs/ecs.hpp"
 #include "../components/components.hpp"
+#include <cstdio>
 #include <raylib.h>
 
 void RenderSystem::renderHealthbar(const ECS& ecs, int entityId) {
@@ -28,22 +29,32 @@ void RenderSystem::render(const ECS& ecs) {
     int entityCount = ecs.getEntityCount();
     const auto& transforms = ecs.getTransforms();
     const auto& renderables = ecs.getRenderables();
+    const auto& doors = ecs.getDoors();
     const auto& healths = ecs.getHealths();
     
     for (int i = 0; i < entityCount; i++) {
         if (!entities[i].active) continue;
-        if (!transforms.isActive(i) || !renderables.isActive(i)) continue;
-        
-        const TransformComponent &transform = transforms.get(i);
-        const auto& renderable = renderables.get(i);
-        
-        DrawCircleV(transform.position, renderable.radius, renderable.color);
-        
-        EntityTag tags = entities[i].tags;
-        if (((tags & EntityTag::ENEMY) == EntityTag::ENEMY || 
-             (tags & EntityTag::PLAYER) == EntityTag::PLAYER) && 
-            healths.isActive(i)) {
-            renderHealthbar(ecs, i);
+
+        if (transforms.isActive(i)){
+            /*  TODO renderables have to render doors and enemies */
+            if(doors.isActive(i)){
+                const TransformComponent &transform = transforms.get(i);
+                const auto& door = doors.get(i);
+
+                DrawRectangle(transform.position.x, transform.position.y, door.width, door.height, GRAY);
+            }else if (renderables.isActive(i)){
+                const TransformComponent &transform = transforms.get(i);
+                const auto& renderable = renderables.get(i);
+                
+                DrawCircleV(transform.position, renderable.radius, renderable.color);
+                
+                EntityTag tags = entities[i].tags;
+                if (((tags & EntityTag::ENEMY) == EntityTag::ENEMY || 
+                     (tags & EntityTag::PLAYER) == EntityTag::PLAYER) && 
+                    healths.isActive(i)) {
+                    renderHealthbar(ecs, i);
+                }
+            }
         }
     }
 }

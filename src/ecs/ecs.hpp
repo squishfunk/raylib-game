@@ -70,6 +70,8 @@ private:
     ComponentStorage<RenderableComponent> renderables;
     ComponentStorage<HealthComponent> healths;
     ComponentStorage<EnemyComponent> enemies;
+    ComponentStorage<DoorComponent> doors;
+    ComponentStorage<ShootableComponent> shootables;
     
 public:
     ECS() : entityCount(0) {
@@ -99,6 +101,14 @@ public:
     EnemyComponent* getEnemy(int entityId);
     const EnemyComponent* getEnemy(int entityId) const;
     
+    void addDoor(int entityId, float width, float height);
+    DoorComponent* getDoor(int entityId);
+    const DoorComponent* getDoor(int entityId) const;
+    
+    void addShootable(int entityId, float shootingRange, float shootingSpeed, float shootCooldown);
+    ShootableComponent* getShootable(int entityId);
+    const ShootableComponent* getShootable(int entityId) const;
+    
     const std::array<Entity, MAX_ENTITIES>& getEntities() const { return entities; }
     std::array<Entity, MAX_ENTITIES>& getEntities() { return entities; }
     int getEntityCount() const { return entityCount; }
@@ -117,6 +127,12 @@ public:
     
     ComponentStorage<EnemyComponent>& getEnemies() { return enemies; }
     const ComponentStorage<EnemyComponent>& getEnemies() const { return enemies; }
+    
+    ComponentStorage<DoorComponent>& getDoors() { return doors; }
+    const ComponentStorage<DoorComponent>& getDoors() const { return doors; }
+    
+    ComponentStorage<ShootableComponent>& getShootables() { return shootables; }
+    const ComponentStorage<ShootableComponent>& getShootables() const { return shootables; }
 };
 
 #endif // ECS_HPP

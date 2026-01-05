@@ -68,6 +68,18 @@ inline EntityTag& operator|=(EntityTag& a, EntityTag b) {
     return a;
 }
 
+struct DoorComponent {
+    float width;
+    float height;
+};
+
+struct ShootableComponent {
+    float lastShootTime;
+    float shootingRange;
+    float shootingSpeed;
+    float shootCooldown;
+};
+
 struct EnemyConfig {
     float radius;
     Color color;
