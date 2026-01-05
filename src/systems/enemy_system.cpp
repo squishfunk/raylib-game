@@ -1,10 +1,10 @@
-#include "../ecs.h"
-#include "../helpers.h"
-#include <raylib.h>
+#include "enemy_system.hpp"
+#include "../ecs/ecs.hpp"
+#include "../components/components.hpp"
+#include "../utils/helpers.hpp"
 #include <raymath.h>
-#include <stdio.h>
 
-static const EnemyConfig ENEMY_CONFIGS[] = {
+const EnemyConfig EnemySystem::ENEMY_CONFIGS[] = {
     // ENEMY_TYPE_NORMAL
     {
         .radius = 20.0f,
@@ -47,24 +47,24 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
     }
 };
 
-int enemy_create(ECS *ecs, Vector2 position, EnemyType type){
-    int enemyId = ecs_create_entity(ecs);
-    if(enemyId < 0) return -1;
+int EnemySystem::createEnemy(ECS& ecs, Vector2 position, EnemyType type) {
+    int enemyId = ecs.createEntity();
+    if (enemyId < 0) return -1;
     
+    int typeIndex = static_cast<int>(type);
+    const EnemyConfig* config = &ENEMY_CONFIGS[typeIndex];
     
-    const EnemyConfig *config = &ENEMY_CONFIGS[type];
-
-    /* FIX POSITION DEPENDING ON RADIUS */
+    // Fix position depending on radius
     position.x = (position.x + config->radius > SCREEN_WIDTH) ? SCREEN_WIDTH - config->radius : position.x;
     position.x = (position.x - config->radius < 0) ? config->radius : position.x;
     position.y = (position.y + config->radius > SCREEN_HEIGHT) ? SCREEN_HEIGHT - config->radius : position.y;
     position.y = (position.y - config->radius < 0) ? config->radius : position.y;
     
-    ecs_add_tranform(ecs, enemyId, position);
-    ecs_add_velocity(ecs, enemyId, (Vector2){0, 0});
-    ecs_add_renderable(ecs, enemyId, config->radius, config->color);
-    ecs_add_health(ecs, enemyId, config->health, config->maxHealth);
-
+    ecs.addTransform(enemyId, position);
+    ecs.addVelocity(enemyId, Vector2{0, 0});
+    ecs.addRenderable(enemyId, config->radius, config->color);
+    ecs.addHealth(enemyId, config->health, config->maxHealth);
+    
     EnemyComponent enemyComp = {
         .type = type,
         .movementSpeed = config->movementSpeed,
@@ -72,36 +72,43 @@ int enemy_create(ECS *ecs, Vector2 position, EnemyType type){
         .attackCooldown = config->attackCooldown,
         .lastAttackTime = 0.0f
     };
-
-    ecs_add_enemy(ecs, enemyId, &enemyComp);
-
-    ecs->entities[enemyId].tags = TAG_ENEMY;
-
+    
+    ecs.addEnemy(enemyId, enemyComp);
+    ecs.getEntities()[enemyId].tags = EntityTag::ENEMY;
+    
     return enemyId;
 }
 
-void enemy_movement_system(ECS *ecs){
-    for(int i = 0; i < ecs->entityCount; i++){
-        if(!ecs->entities[i].active || !(ecs->entities[i].tags & TAG_ENEMY)) continue;
-
-        int playerId = get_player_id(ecs); 
+void EnemySystem::updateMovement(ECS& ecs) {
+    const auto& entities = ecs.getEntities();
+    int entityCount = ecs.getEntityCount();
+    auto& transforms = ecs.getTransforms();
+    auto& velocities = ecs.getVelocities();
+    
+    int playerId = Helpers::getPlayerId(ecs);
+    if (playerId < 0) return;
+    
+    const auto& playerTransform = transforms.get(playerId);
+    
+    for (int i = 0; i < entityCount; i++) {
+        if (!entities[i].active) continue;
+        if ((entities[i].tags & EntityTag::ENEMY) != EntityTag::ENEMY) continue;
         
-        Vector2 enemyPos = ecs->transforms.data[i].position;
-        Vector2 playerPos = ecs->transforms.data[playerId].position;
-
+        Vector2 enemyPos = transforms.get(i).position;
+        Vector2 playerPos = playerTransform.position;
+        
         float speed = 200.0f;
-
+        
         Vector2 direction = Vector2Subtract(playerPos, enemyPos);
-
+        
         float length = Vector2Length(direction);
         if (length < 0.001f) {
-            ecs->velocities.data[i].velocity = (Vector2){0, 0};
+            velocities.get(i).velocity = Vector2{0, 0};
             continue;
         }
-
+        
         Vector2 velocity = Vector2Scale(Vector2Normalize(direction), speed);
-
-
-        ecs->velocities.data[i].velocity = velocity;
+        velocities.get(i).velocity = velocity;
     }
 }
+
