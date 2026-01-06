@@ -6,7 +6,6 @@
 #include "../systems/health_system.hpp"
 #include "../systems/render_system.hpp"
 #include "../systems/bullet_system.hpp"
-#include "../systems/room_system.hpp"
 #include "../systems/door_system.hpp"
 #include "../factories/player_factory.hpp"
 #include "../map/map.hpp"
@@ -146,7 +145,7 @@ void Game::updatePlaying() {
     
     PlayerSystem::update(ecs);
     BulletSystem::update(ecs, screenHeight, screenWidth);
-    EnemySystem::updateMovement(ecs);
+    EnemySystem::update(ecs);
     MovementSystem::update(ecs);
     CollisionSystem::update(ecs);
     HealthSystem::update(ecs);
@@ -161,9 +160,7 @@ void Game::updatePlaying() {
 
 void Game::renderPlaying() const {
     ClearBackground(RAYWHITE);
-    
-    // map.renderCurrentRoom(this->screenWidth, this->screenHeight);
-    
+
     RenderSystem::render(ecs);
     
     map.renderMinimap(10, 10);

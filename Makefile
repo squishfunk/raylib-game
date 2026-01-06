@@ -15,7 +15,6 @@ SOURCES = $(SRCDIR)/main.cpp \
           $(SRCDIR)/systems/player_system.cpp \
           $(SRCDIR)/systems/enemy_system.cpp \
           $(SRCDIR)/systems/door_system.cpp \
-          $(SRCDIR)/systems/room_system.cpp \
           $(SRCDIR)/game/game.cpp \
           $(SRCDIR)/map/dungeon.cpp \
           $(SRCDIR)/factories/door_factory.cpp \

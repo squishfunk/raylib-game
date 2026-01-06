@@ -280,8 +280,7 @@ std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectan
     
     switch (roomType) {
         case RoomType::START:
-            // Pokój startowy - może być pusty lub kilka słabych przeciwników
-            if (GetRandomValue(0, 100) < 30) { // 30% szansy na przeciwników
+            if (GetRandomValue(0, 100) < 30) {
                 int count = GetRandomValue(1, 2);
                 for (int i = 0; i < count; i++) {
                     float x = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.width) - 100));
@@ -292,14 +291,12 @@ std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectan
             break;
             
         case RoomType::NORMAL:
-            // Zwykłe pokoje - losowa liczba przeciwników różnych typów
             {
                 int count = GetRandomValue(2, 5);
                 for (int i = 0; i < count; i++) {
                     float x = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.width) - 50));
                     float y = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.height) - 50));
                     
-                    // Losowy typ przeciwnika (NORMAL, FAST, TANK - bez BOSS)
                     int typeRoll = GetRandomValue(0, 100);
                     EnemyType type;
                     if (typeRoll < 50) {
@@ -316,15 +313,12 @@ std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectan
             break;
             
         case RoomType::BOSS:
-            // Pokój bossa - jeden boss + kilka normalnych przeciwników
             {
-                // Boss w centrum
                 spawns.push_back(EnemySpawn{
                     Vector2{bounds.width / 2.0f, bounds.height / 2.0f}, 
                     EnemyType::BOSS
                 });
                 
-                // 2-4 normalnych przeciwników wokół
                 int minionCount = GetRandomValue(2, 4);
                 for (int i = 0; i < minionCount; i++) {
                     float angle = (i * 360.0f / minionCount) * DEG2RAD;
@@ -332,7 +326,6 @@ std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectan
                     float x = bounds.width / 2.0f + cosf(angle) * radius;
                     float y = bounds.height / 2.0f + sinf(angle) * radius;
                     
-                    // Upewnij się, że pozycja jest w granicach
                     x = (x < 50) ? 50 : (x > bounds.width - 50) ? bounds.width - 50 : x;
                     y = (y < 50) ? 50 : (y > bounds.height - 50) ? bounds.height - 50 : y;
                     
@@ -342,8 +335,7 @@ std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectan
             break;
             
         case RoomType::TREASURE:
-            // Pokój skarbu - może być pusty lub kilka strażników
-            if (GetRandomValue(0, 100) < 60) { // 60% szansy na strażników
+            if (GetRandomValue(0, 100) < 60) {
                 int count = GetRandomValue(1, 3);
                 for (int i = 0; i < count; i++) {
                     float x = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.width) - 100));
@@ -354,7 +346,6 @@ std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectan
             break;
             
         case RoomType::SECRET:
-            // Sekretny pokój - może być pusty lub specjalne przeciwniki
             if (GetRandomValue(0, 100) < 40) {
                 int count = GetRandomValue(1, 2);
                 for (int i = 0; i < count; i++) {

@@ -6,17 +6,6 @@
 #include <raylib.h>
 #include <raymath.h>
 
-int PlayerSystem::createPlayer(ECS& ecs, int initX, int initY) {
-    int playerId = ecs.createEntity();
-    ecs.addTransform(playerId, Vector2{static_cast<float>(initX), static_cast<float>(initY)});
-    ecs.addVelocity(playerId, Vector2{0, 0});
-    ecs.addRenderable(playerId, 20.0f, GREEN);
-    ecs.addHealth(playerId, 100, 100);
-    ecs.addShootable(playerId, 1000.0f, BULLET_SPEED, SHOOT_COOLDOWN);
-    ecs.getEntities()[playerId].tags = EntityTag::PLAYER;
-    return playerId;
-}
-
 void PlayerSystem::update(ECS &ecs){
     int playerId = Helpers::getPlayerId(ecs);
 

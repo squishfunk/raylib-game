@@ -26,23 +26,23 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
     switch(entryDoor){
         case DoorFlags::UP: 
             newPosition.x = room.bounds.width / 2.0f;
-            newPosition.y = room.bounds.height - 50.0f;  // Na dole, blisko drzwi
+            newPosition.y = room.bounds.height - 50.0f;
             break;
         case DoorFlags::DOWN: 
             newPosition.x = room.bounds.width / 2.0f;
-            newPosition.y = 50.0f;  // Na górze, blisko drzwi
+            newPosition.y = 50.0f;
             break;
         case DoorFlags::LEFT: 
-            newPosition.x = room.bounds.width - 50.0f;  // Po prawej, blisko drzwi
+            newPosition.x = room.bounds.width - 50.0f;
             newPosition.y = room.bounds.height / 2.0f;
             break;
         case DoorFlags::RIGHT: 
-            newPosition.x = 50.0f;  // Po lewej, blisko drzwi
+            newPosition.x = 50.0f;
             newPosition.y = room.bounds.height / 2.0f;
             break;
         default:
             newPosition.x = room.bounds.width / 2.0f;
-            newPosition.y = room.bounds.height / 2.0f;  // Środek pokoju
+            newPosition.y = room.bounds.height / 2.0f;
             break;
     }
     playerTransform->position = newPosition;
@@ -85,7 +85,6 @@ void Dungeon::spawnDoors(const Room& room) {
         DoorFlags::RIGHT
     };
     
-    // Iteruj przez wszystkie możliwe drzwi
     for (DoorFlags doorFlag : allDoors) {
         if ((room.doors & doorFlag) != DoorFlags::NONE) {
             int door = DoorFactory::create(ecs, doorFlag);
