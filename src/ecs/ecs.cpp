@@ -118,9 +118,10 @@ const EnemyComponent* ECS::getEnemy(int entityId) const {
     return enemies.getPtr(entityId);
 }
 
-void ECS::addDoor(int entityId, float width, float height) {
+void ECS::addDoor(int entityId, float width, float height, DoorFlags direction) {
     doors.get(entityId).width = width;
     doors.get(entityId).height = height;
+    doors.get(entityId).direction = direction;
     doors.setActive(entityId, true);
 }
 

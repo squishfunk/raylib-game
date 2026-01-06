@@ -96,7 +96,7 @@ void Map::generate() {
             }
             rooms[currentY][currentX].gridX = currentX;
             rooms[currentY][currentX].gridY = currentY;
-            rooms[currentY][currentX].bounds = Rectangle{0, 0, 1000.0f, 650.0f}; 
+            rooms[currentY][currentX].bounds = roomBounds; 
         }
     }
     
@@ -124,6 +124,7 @@ void Map::generate() {
                 rooms[newY][newX].type = RoomType::NORMAL;
                 rooms[newY][newX].gridX = newX;
                 rooms[newY][newX].gridY = newY;
+                rooms[newY][newX].bounds = roomBounds;
             }
         }
     }

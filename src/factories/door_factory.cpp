@@ -48,7 +48,7 @@ int DoorFactory::create(ECS& ecs, DoorFlags doorFlag) {
     }
 
     ecs.addTransform(doorId, pos);
-    ecs.addDoor(doorId, width, height);
+    ecs.addDoor(doorId, width, height, doorFlag);
 
     return doorId;
 }

@@ -2,6 +2,7 @@
 #define ECS_HPP
 
 #include "../components/components.hpp"
+#include "../map/map.hpp"
 #include <array>
 
 class Game;
@@ -101,7 +102,7 @@ public:
     EnemyComponent* getEnemy(int entityId);
     const EnemyComponent* getEnemy(int entityId) const;
     
-    void addDoor(int entityId, float width, float height);
+    void addDoor(int entityId, float width, float height, DoorFlags direction);
     DoorComponent* getDoor(int entityId);
     const DoorComponent* getDoor(int entityId) const;
     

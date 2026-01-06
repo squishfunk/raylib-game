@@ -4,6 +4,8 @@
 #include <raylib.h>
 #include <cstdint>
 
+enum class DoorFlags : uint8_t;
+
 
 constexpr int MAX_ENTITIES = 1024;
 constexpr float MOVEMENT_SPEED = 350.0f;
@@ -71,6 +73,7 @@ inline EntityTag& operator|=(EntityTag& a, EntityTag b) {
 struct DoorComponent {
     float width;
     float height;
+    DoorFlags direction;
 };
 
 struct ShootableComponent {

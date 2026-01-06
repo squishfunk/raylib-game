@@ -2,9 +2,11 @@
 #include "../ecs/ecs.hpp"
 #include "../components/components.hpp"
 #include "../utils/helpers.hpp"
+#include "../events/eventbus.hpp"
+#include "../events/events.hpp"
 #include <cstdio>
 
-void DoorSystem::update(ECS& ecs) {
+void DoorSystem::update(ECS& ecs, EventBus& eventBus) {
     int playerId = Helpers::getPlayerId(ecs);
     
     if (playerId < 0 || !ecs.getHealths().isActive(playerId)) return;
@@ -30,7 +32,8 @@ void DoorSystem::update(ECS& ecs) {
             playerTransform.position, playerRenderable.radius,
             doorTransform.position, doorComponent.width, doorComponent.height)) {
             
-            printf("Kolizja z drzwiami! (Entity ID: %d)\n", i);
+            DoorCollisionEvent event(i, doorComponent.direction);
+            eventBus.emit(event);
         }
     }
 }

@@ -96,6 +96,7 @@ public:
     
     int getCurrentX() const { return currentX; }
     int getCurrentY() const { return currentY; }
+    void setCurrentRoom(int x, int y) { currentX = x; currentY = y; }
     const Room& getRoom(int x, int y) const { return rooms[y][x]; }
     Room& getRoom(int x, int y) { return rooms[y][x]; }
     bool isGenerated() const { return generated; }

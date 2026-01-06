@@ -128,7 +128,7 @@ void Game::initGame(){
     const Room& startRoom = map.getRoom(startX, startY);
     assert(startRoom.type == RoomType::START && "Error: Start room is EMPTY!");
 
-    dungeonManager = new Dungeon(ecs, map, playerId);
+    dungeonManager = new Dungeon(ecs, map, playerId, eventBus);
     dungeonManager->loadRoom(startRoom, DoorFlags::NONE);
 
     currentState = GameState::PLAYING;
@@ -149,7 +149,7 @@ void Game::updatePlaying() {
     MovementSystem::update(ecs);
     CollisionSystem::update(ecs);
     HealthSystem::update(ecs);
-    DoorSystem::update(ecs);
+    DoorSystem::update(ecs, eventBus);
     
     Map::checkRoomCleared(*this);
     

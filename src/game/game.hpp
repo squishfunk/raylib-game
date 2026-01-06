@@ -4,6 +4,7 @@
 #include "../ecs/ecs.hpp"
 #include "../map/map.hpp"
 #include "../map/dungeon.hpp"
+#include "../events/eventbus.hpp"
 #include <string>
 
 
@@ -22,6 +23,7 @@ private:
 
     GameState currentState;
     ECS ecs;
+    EventBus eventBus;
     int playerId;
     Dungeon *dungeonManager;
     
