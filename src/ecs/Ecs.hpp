@@ -73,6 +73,7 @@ private:
     ComponentStorage<EnemyComponent> enemies;
     ComponentStorage<DoorComponent> doors;
     ComponentStorage<ShootableComponent> shootables;
+    ComponentStorage<AudioComponent> audios;
     
 public:
     ECS() : entityCount(0) {
@@ -110,6 +111,11 @@ public:
     ShootableComponent* getShootable(int entityId);
     const ShootableComponent* getShootable(int entityId) const;
     
+    void addAudio(int entityId, Sound sound);  // For player and doors (shoot only)
+    void addAudio(int entityId, Sound idle, Sound hit, Sound die);  // For enemies (all sounds)
+    AudioComponent* getAudio(int entityId);
+    const AudioComponent* getAudio(int entityId) const;
+    
     const std::array<Entity, MAX_ENTITIES>& getEntities() const { return entities; }
     std::array<Entity, MAX_ENTITIES>& getEntities() { return entities; }
     int getEntityCount() const { return entityCount; }
@@ -134,6 +140,9 @@ public:
     
     ComponentStorage<ShootableComponent>& getShootables() { return shootables; }
     const ComponentStorage<ShootableComponent>& getShootables() const { return shootables; }
+    
+    ComponentStorage<AudioComponent>& getAudios() { return audios; }
+    const ComponentStorage<AudioComponent>& getAudios() const { return audios; }
 };
 
 #endif // ECS_HPP

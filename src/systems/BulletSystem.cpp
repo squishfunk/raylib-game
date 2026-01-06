@@ -43,6 +43,12 @@ void BulletSystem::update(ECS& ecs, int screenWidth, int screenHeight) {
                 enemyHealth.healthPoints -= BULLET_DAMAGE;
                 enemyHealth.lastDamageTime = currentTime;
                 ecs.getEntities()[i].active = false;
+                
+                // Play hit sound
+                if (ecs.getAudios().isActive(j)) {
+                    PlaySound(ecs.getAudio(j)->hit);
+                }
+                
                 printf("Enemy id: %d Hit. Current health: %d \n", j, enemyHealth.healthPoints);
             }
         }

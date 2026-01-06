@@ -1,5 +1,6 @@
 #include "DoorFactory.hpp"
 #include <cstdio>
+#include <raylib.h>
 
 static constexpr int SCREEN_WIDTH = 1000;
 static constexpr int SCREEN_HEIGHT = 650;
@@ -49,6 +50,8 @@ int DoorFactory::create(ECS& ecs, DoorFlags doorFlag) {
 
     ecs.addTransform(doorId, pos);
     ecs.addDoor(doorId, width, height, doorFlag);
+    Sound shoot = LoadSound("resources/sounds/door.wav");
+    ecs.addAudio(doorId, shoot);
 
     return doorId;
 }

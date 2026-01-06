@@ -13,6 +13,7 @@ int ECS::createEntity() {
             enemies.setActive(i, false);
             doors.setActive(i, false);
             shootables.setActive(i, false);
+            audios.setActive(i, false);
             return i;
         }
     }
@@ -32,6 +33,7 @@ int ECS::createEntity() {
     enemies.setActive(entityId, false);
     doors.setActive(entityId, false);
     shootables.setActive(entityId, false);
+    audios.setActive(entityId, false);
     
     return entityId;
 }
@@ -48,6 +50,7 @@ void ECS::destroyEntity(int entityId) {
     enemies.setActive(entityId, false);
     doors.setActive(entityId, false);
     shootables.setActive(entityId, false);
+    audios.setActive(entityId, false);
 }
 
 void ECS::addTransform(int entityId, Vector2 position) {
@@ -147,5 +150,33 @@ ShootableComponent* ECS::getShootable(int entityId) {
 
 const ShootableComponent* ECS::getShootable(int entityId) const {
     return shootables.getPtr(entityId);
+}
+
+void ECS::addAudio(int entityId, Sound sound) {
+    audios.get(entityId).shoot = sound;
+    // Initialize empty sounds
+    Sound emptySound = {0};
+    audios.get(entityId).idle = emptySound;
+    audios.get(entityId).hit = emptySound;
+    audios.get(entityId).die = emptySound;
+    audios.setActive(entityId, true);
+}
+
+void ECS::addAudio(int entityId, Sound idle, Sound hit, Sound die) {
+    // Initialize empty sound for shoot
+    Sound emptySound = {0};
+    audios.get(entityId).shoot = emptySound;
+    audios.get(entityId).idle = idle;
+    audios.get(entityId).hit = hit;
+    audios.get(entityId).die = die;
+    audios.setActive(entityId, true);
+}
+
+AudioComponent* ECS::getAudio(int entityId) {
+    return audios.getPtr(entityId);
+}
+
+const AudioComponent* ECS::getAudio(int entityId) const {
+    return audios.getPtr(entityId);
 }
 

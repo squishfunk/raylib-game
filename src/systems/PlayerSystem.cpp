@@ -69,6 +69,10 @@ void PlayerSystem::handleShooting(ECS& ecs, int playerId) {
         ecs.getEntities()[bulletId].tags = EntityTag::BULLET;
     }
     
+    if (ecs.getAudios().isActive(playerId)) {
+        PlaySound(ecs.getAudio(playerId)->shoot);
+    }
+    
     shootable.lastShootTime = currentTime;
 }
 

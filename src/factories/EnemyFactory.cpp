@@ -1,6 +1,9 @@
 #include "EnemyFactory.hpp"
 #include "../components/Components.hpp"
 #include <cassert>
+#include <raylib.h>
+#include <cstdlib>
+#include <ctime>
 
 static const EnemyConfig ENEMY_CONFIGS[] = {
     // ENEMY_TYPE_NORMAL
@@ -69,15 +72,24 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
     ecs.addRenderable(enemyId, config->radius, config->color);
     ecs.addHealth(enemyId, config->health, config->maxHealth);
     
+    float currentTime = GetTime();
+    float randomDelay = 1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f)); // 1-5 seconds
+    
     EnemyComponent enemyComp = {
         .type = data.type,
         .movementSpeed = config->movementSpeed,
         .damage = config->damage,
         .attackCooldown = config->attackCooldown,
-        .lastAttackTime = 0.0f
+        .lastAttackTime = 0.0f,
+        .lastSoundTime = 0.0f,
+        .nextSoundTime = currentTime + randomDelay
     };
     
     ecs.addEnemy(enemyId, enemyComp);
+    Sound idle = LoadSound("resources/sounds/enemy_idle.wav");
+    Sound hit = LoadSound("resources/sounds/enemy_hit.wav");
+    Sound die = LoadSound("resources/sounds/enemy_die.wav");
+    ecs.addAudio(enemyId, idle, hit, die);
     ecs.getEntities()[enemyId].tags = EntityTag::ENEMY;
     
     return enemyId;

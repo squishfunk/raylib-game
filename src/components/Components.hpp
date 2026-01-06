@@ -48,6 +48,8 @@ struct EnemyComponent {
     int damage;
     float attackCooldown;
     float lastAttackTime;
+    float lastSoundTime;
+    float nextSoundTime;
 };
 
 enum class EntityTag : uint8_t {
@@ -81,6 +83,13 @@ struct ShootableComponent {
     float shootingRange;
     float shootingSpeed;
     float shootCooldown;
+};
+
+struct AudioComponent {
+    Sound shoot;  // For player and doors
+    Sound idle;   // For enemies - idle sounds
+    Sound hit;    // For enemies - hit sound
+    Sound die;    // For enemies - death sound
 };
 
 struct EnemyConfig {

@@ -29,12 +29,14 @@ dungeonManager(nullptr)
         return;
     }
 
+    InitAudioDevice();
     SetTargetFPS(60);
 }
 
 Game::~Game() {
     delete dungeonManager;
 
+    CloseAudioDevice();
     if (IsWindowReady()) {
         CloseWindow();
     }

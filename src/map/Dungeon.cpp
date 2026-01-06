@@ -4,6 +4,7 @@
 #include "../factories/EnemyFactory.hpp"
 #include <cassert>
 #include <cstdio>
+#include <raylib.h>
 
 
 Dungeon::Dungeon(ECS& ecs, Map &map, int playerId, EventBus& eventBus): 
@@ -138,6 +139,11 @@ void Dungeon::onDoorCollision(const DoorCollisionEvent& event) {
     const Room& targetRoom = map.getRoom(newX, newY);
     
     assert(!((currentRoom.doors & event.doorDirection) == DoorFlags::NONE) && "Trying to move from room through non existing doors");
+    
+    // Play door sound
+    if (ecs.getAudios().isActive(event.entityId)) {
+        PlaySound(ecs.getAudio(event.entityId)->shoot);
+    }
     
     map.setCurrentRoom(newX, newY);
     
