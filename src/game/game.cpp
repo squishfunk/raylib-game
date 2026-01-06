@@ -151,7 +151,7 @@ void Game::updatePlaying() {
     HealthSystem::update(ecs);
     DoorSystem::update(ecs, eventBus);
     
-    Map::checkRoomCleared(*this);
+    // Map::checkRoomCleared(*this);
     
     if (!ecs.getEntities()[playerId].active) {
         currentState = GameState::GAME_OVER;

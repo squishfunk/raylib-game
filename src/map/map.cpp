@@ -88,15 +88,19 @@ void Map::generate() {
             
             currentX = newX;
             currentY = newY;
+
+            RoomType roomType;
             
             if (i == pathLength - 1) {
-                rooms[currentY][currentX].type = RoomType::BOSS;
+                roomType = RoomType::BOSS;
             } else {
-                rooms[currentY][currentX].type = RoomType::NORMAL;
+                roomType = RoomType::NORMAL;
             }
             rooms[currentY][currentX].gridX = currentX;
             rooms[currentY][currentX].gridY = currentY;
             rooms[currentY][currentX].bounds = roomBounds; 
+            rooms[currentY][currentX].type = roomType;
+            rooms[currentY][currentX].enemySpawns = generateEnemySpawns(rooms[currentY][currentX].type, roomBounds);
         }
     }
     
@@ -125,6 +129,7 @@ void Map::generate() {
                 rooms[newY][newX].gridX = newX;
                 rooms[newY][newX].gridY = newY;
                 rooms[newY][newX].bounds = roomBounds;
+                rooms[currentY][currentX].enemySpawns = generateEnemySpawns(RoomType::START, roomBounds);
             }
         }
     }
@@ -253,28 +258,28 @@ void Map::moveToRoom(Game& game, int newX, int newY) {
     rooms[newY][newX].visited = true;
 }
 
-void Map::checkRoomCleared(Game& game) {
-    ECS& ecs = game.getECS();
-    Map& map = game.getMap();
-    Room& currentRoom = map.getRoom(map.getCurrentX(), map.getCurrentY());
+// void Map::checkRoomCleared(Game& game) {
+//     ECS& ecs = game.getECS();
+//     Map& map = game.getMap();
+//     Room& currentRoom = map.getRoom(map.getCurrentX(), map.getCurrentY());
     
-    if (currentRoom.cleared) return;
+//     if (currentRoom.cleared) return;
     
-    bool hasActiveEnemies = false;
-    const auto& entities = ecs.getEntities();
-    int entityCount = ecs.getEntityCount();
+//     bool hasActiveEnemies = false;
+//     const auto& entities = ecs.getEntities();
+//     int entityCount = ecs.getEntityCount();
     
-    for (int i = 0; i < entityCount; i++) {
-        if (entities[i].active && (entities[i].tags & EntityTag::ENEMY) == EntityTag::ENEMY) {
-            hasActiveEnemies = true;
-            break;
-        }
-    }
+//     for (int i = 0; i < entityCount; i++) {
+//         if (entities[i].active && (entities[i].tags & EntityTag::ENEMY) == EntityTag::ENEMY) {
+//             hasActiveEnemies = true;
+//             break;
+//         }
+//     }
     
-    if (!hasActiveEnemies) {
-        currentRoom.cleared = true;
-    }
-}
+//     if (!hasActiveEnemies) {
+//         currentRoom.cleared = true;
+//     }
+// }
 
 std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectangle& bounds) {
     std::vector<EnemySpawn> spawns;

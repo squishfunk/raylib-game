@@ -31,18 +31,18 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
     switch(entryDoor){
         case DoorFlags::UP: 
             newPosition.x = room.bounds.width / 2.0f;
-            newPosition.y = room.bounds.height - 50.0f;
+            newPosition.y = 100.0f;
             break;
         case DoorFlags::DOWN: 
             newPosition.x = room.bounds.width / 2.0f;
-            newPosition.y = 50.0f;
+            newPosition.y = room.bounds.height - 100.0f;
             break;
         case DoorFlags::LEFT: 
-            newPosition.x = room.bounds.width - 50.0f;
+            newPosition.x = 100.0f;
             newPosition.y = room.bounds.height / 2.0f;
             break;
         case DoorFlags::RIGHT: 
-            newPosition.x = 50.0f;
+            newPosition.x = room.bounds.width - 100.0f;
             newPosition.y = room.bounds.height / 2.0f;
             break;
         default:
@@ -53,11 +53,12 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
     playerTransform->position = newPosition;
 
     spawnDoors(room);
-    spawnEnemies(room);
+    if(!room.cleared){
+        spawnEnemies(room);
+    }
 }
 
 void Dungeon::despawnCurrentRoom() {
-
     for (int i = 0; i < ecs.getEntityCount(); i++) {
         if (i == playerId) continue;
         ecs.destroyEntity(i);
@@ -108,6 +109,8 @@ void Dungeon::onDoorCollision(const DoorCollisionEvent& event) {
     
     const Room& currentRoom = map.getRoom(currentX, currentY);
     
+    checkRoomCleared();
+
     if (!currentRoom.cleared) {
         return;
     }
@@ -157,5 +160,26 @@ DoorFlags Dungeon::getOppositeDoor(DoorFlags door) const {
             return DoorFlags::LEFT;
         default:
             return DoorFlags::NONE;
+    }
+}
+
+void Dungeon::checkRoomCleared() {
+    Room& currentRoom = map.getRoom(map.getCurrentX(), map.getCurrentY());
+    
+    if (currentRoom.cleared) return;
+    
+    bool hasActiveEnemies = false;
+    const auto& entities = ecs.getEntities();
+    int entityCount = ecs.getEntityCount();
+    
+    for (int i = 0; i < entityCount; i++) {
+        if (entities[i].active && (entities[i].tags & EntityTag::ENEMY) == EntityTag::ENEMY) {
+            hasActiveEnemies = true;
+            break;
+        }
+    }
+    
+    if (!hasActiveEnemies) {
+        currentRoom.cleared = true;
     }
 }
