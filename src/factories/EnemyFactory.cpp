@@ -1,5 +1,5 @@
-#include "enemy_factory.hpp"
-#include "../components/components.hpp"
+#include "EnemyFactory.hpp"
+#include "../components/Components.hpp"
 #include <cassert>
 
 static const EnemyConfig ENEMY_CONFIGS[] = {

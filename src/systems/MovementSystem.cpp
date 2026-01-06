@@ -1,5 +1,5 @@
-#include "movement_system.hpp"
-#include "../ecs/ecs.hpp"
+#include "MovementSystem.hpp"
+#include "../ecs/Ecs.hpp"
 #include <raylib.h>
 
 void MovementSystem::update(ECS& ecs) {

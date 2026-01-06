@@ -1,5 +1,5 @@
-#include "helpers.hpp"
-#include "../ecs/ecs.hpp"
+#include "Helpers.hpp"
+#include "../ecs/Ecs.hpp"
 
 namespace Helpers {
     bool checkCircleCollision(Vector2 pos1, float radius1, Vector2 pos2, float radius2) {

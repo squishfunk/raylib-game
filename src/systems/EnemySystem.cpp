@@ -1,7 +1,7 @@
-#include "enemy_system.hpp"
-#include "../ecs/ecs.hpp"
-#include "../components/components.hpp"
-#include "../utils/helpers.hpp"
+#include "EnemySystem.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../components/Components.hpp"
+#include "../utils/Helpers.hpp"
 #include <raymath.h>
 
 void EnemySystem::update(ECS& ecs) {

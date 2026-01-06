@@ -1,4 +1,4 @@
-#include "player_factory.hpp"
+#include "PlayerFactory.hpp"
 
 static constexpr float PLAYER_RADIUS = 20.0f;
 static constexpr int PLAYER_MAX_HP = 100;

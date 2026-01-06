@@ -1,4 +1,4 @@
-#include "ecs.hpp"
+#include "Ecs.hpp"
 
 int ECS::createEntity() {
     for (int i = 0; i < entityCount; i++) {

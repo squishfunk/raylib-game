@@ -5,23 +5,24 @@ LDFLAGS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 SRCDIR = src
 BUILDDIR = build
 SOURCES = $(SRCDIR)/main.cpp \
-          $(SRCDIR)/ecs/ecs.cpp \
-          $(SRCDIR)/map/map.cpp \
-          $(SRCDIR)/systems/movement_system.cpp \
-          $(SRCDIR)/systems/render_system.cpp \
-          $(SRCDIR)/systems/health_system.cpp \
-          $(SRCDIR)/systems/bullet_system.cpp \
-          $(SRCDIR)/systems/collision_system.cpp \
-          $(SRCDIR)/systems/player_system.cpp \
-          $(SRCDIR)/systems/enemy_system.cpp \
-          $(SRCDIR)/systems/door_system.cpp \
-          $(SRCDIR)/systems/room_system.cpp \
-          $(SRCDIR)/game/game.cpp \
-          $(SRCDIR)/map/dungeon.cpp \
-          $(SRCDIR)/factories/door_factory.cpp \
-          $(SRCDIR)/factories/enemy_factory.cpp \
-          $(SRCDIR)/factories/player_factory.cpp \
-          $(SRCDIR)/utils/helpers.cpp
+          $(SRCDIR)/ecs/Ecs.cpp \
+          $(SRCDIR)/map/Map.cpp \
+          $(SRCDIR)/systems/MovementSystem.cpp \
+          $(SRCDIR)/systems/RenderSystem.cpp \
+          $(SRCDIR)/systems/HealthSystem.cpp \
+          $(SRCDIR)/systems/BulletSystem.cpp \
+          $(SRCDIR)/systems/CollisionSystem.cpp \
+          $(SRCDIR)/systems/PlayerSystem.cpp \
+          $(SRCDIR)/systems/EnemySystem.cpp \
+          $(SRCDIR)/systems/DoorSystem.cpp \
+          $(SRCDIR)/systems/RoomSystem.cpp \
+          $(SRCDIR)/game/Game.cpp \
+          $(SRCDIR)/map/Dungeon.cpp \
+          $(SRCDIR)/factories/DoorFactory.cpp \
+          $(SRCDIR)/factories/EnemyFactory.cpp \
+          $(SRCDIR)/factories/PlayerFactory.cpp \
+          $(SRCDIR)/utils/Helpers.cpp \
+          $(SRCDIR)/events/EventBus.cpp
 
 OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
 TARGET = $(BUILDDIR)/main

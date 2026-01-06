@@ -1,9 +1,9 @@
-#include "map.hpp"
-#include "../game/game.hpp"
-#include "../ecs/ecs.hpp"
-#include "../components/components.hpp"
-#include "../systems/enemy_system.hpp"
-#include "../utils/helpers.hpp"
+#include "Map.hpp"
+#include "../game/Game.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../components/Components.hpp"
+#include "../systems/EnemySystem.hpp"
+#include "../utils/Helpers.hpp"
 #include <cstring>
 #include <cstdlib>
 #include <raylib.h>

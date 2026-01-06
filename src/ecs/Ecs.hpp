@@ -1,8 +1,8 @@
 #ifndef ECS_HPP
 #define ECS_HPP
 
-#include "../components/components.hpp"
-#include "../map/map.hpp"
+#include "../components/Components.hpp"
+#include "../map/Map.hpp"
 #include <array>
 
 class Game;

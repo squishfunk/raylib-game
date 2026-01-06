@@ -1,7 +1,7 @@
-#include "dungeon.hpp"
-#include "map.hpp"
-#include "../factories/door_factory.hpp"
-#include "../factories/enemy_factory.hpp"
+#include "Dungeon.hpp"
+#include "Map.hpp"
+#include "../factories/DoorFactory.hpp"
+#include "../factories/EnemyFactory.hpp"
 #include <cassert>
 #include <cstdio>
 

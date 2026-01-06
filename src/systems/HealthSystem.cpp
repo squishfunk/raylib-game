@@ -1,5 +1,5 @@
-#include "health_system.hpp"
-#include "../ecs/ecs.hpp"
+#include "HealthSystem.hpp"
+#include "../ecs/Ecs.hpp"
 #include <cstdio>
 
 void HealthSystem::update(ECS& ecs) {

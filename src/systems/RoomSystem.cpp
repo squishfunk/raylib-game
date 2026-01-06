@@ -1,7 +1,7 @@
-#include "room_system.hpp"
-#include "../ecs/ecs.hpp"
-#include "../components/components.hpp"
-#include "../map/map.hpp"
+#include "RoomSystem.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../components/Components.hpp"
+#include "../map/Map.hpp"
 
 void RoomSystem::update(ECS& ecs, Map& map) {
     Room& currentRoom = map.getRoom(map.getCurrentX(), map.getCurrentY());

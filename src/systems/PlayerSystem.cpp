@@ -1,8 +1,8 @@
-#include "player_system.hpp"
-#include "../ecs/ecs.hpp"
-#include "../components/components.hpp"
-#include "../utils/helpers.hpp"
-#include "bullet_system.hpp"
+#include "PlayerSystem.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../components/Components.hpp"
+#include "../utils/Helpers.hpp"
+#include "BulletSystem.hpp"
 #include <raylib.h>
 #include <raymath.h>
 

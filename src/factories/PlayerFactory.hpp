@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ecs/ecs.hpp"
+#include "../ecs/Ecs.hpp"
 
 class PlayerFactory {
 public:

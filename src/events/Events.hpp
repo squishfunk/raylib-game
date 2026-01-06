@@ -1,7 +1,7 @@
 #ifndef EVENTS_HPP
 #define EVENTS_HPP
 
-#include "../map/map.hpp"
+#include "../map/Map.hpp"
 
 struct DoorCollisionEvent {
     int entityId;

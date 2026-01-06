@@ -4,7 +4,7 @@
 #include <raylib.h>
 #include <cstdint>
 #include <vector>
-#include "../components/components.hpp"
+#include "../components/Components.hpp"
 
 
 class Game;

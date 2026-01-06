@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../ecs/ecs.hpp"
-#include "../components/components.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../components/Components.hpp"
 #include <raylib.h>
 
 struct EnemySpawnData {

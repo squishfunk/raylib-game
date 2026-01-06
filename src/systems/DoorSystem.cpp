@@ -1,9 +1,9 @@
-#include "door_system.hpp"
-#include "../ecs/ecs.hpp"
-#include "../components/components.hpp"
-#include "../utils/helpers.hpp"
-#include "../events/eventbus.hpp"
-#include "../events/events.hpp"
+#include "DoorSystem.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../components/Components.hpp"
+#include "../utils/Helpers.hpp"
+#include "../events/EventBus.hpp"
+#include "../events/Events.hpp"
 #include <cstdio>
 
 void DoorSystem::update(ECS& ecs, EventBus& eventBus) {

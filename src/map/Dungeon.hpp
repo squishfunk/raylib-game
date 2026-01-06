@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../ecs/ecs.hpp"
-#include "map.hpp"
-#include "../events/eventbus.hpp"
-#include "../events/events.hpp"
+#include "../ecs/Ecs.hpp"
+#include "Map.hpp"
+#include "../events/EventBus.hpp"
+#include "../events/Events.hpp"
 #include <vector>
 
 class Dungeon {

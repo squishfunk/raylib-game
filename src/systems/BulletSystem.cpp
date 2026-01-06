@@ -1,7 +1,7 @@
-#include "bullet_system.hpp"
-#include "../ecs/ecs.hpp"
-#include "../components/components.hpp"
-#include "../utils/helpers.hpp"
+#include "BulletSystem.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../components/Components.hpp"
+#include "../utils/Helpers.hpp"
 #include <raylib.h>
 #include <cstdio>
 

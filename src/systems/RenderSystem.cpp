@@ -1,6 +1,6 @@
-#include "render_system.hpp"
-#include "../ecs/ecs.hpp"
-#include "../components/components.hpp"
+#include "RenderSystem.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../components/Components.hpp"
 #include <cstdio>
 #include <raylib.h>
 

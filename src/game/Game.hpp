@@ -1,10 +1,10 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "../ecs/ecs.hpp"
-#include "../map/map.hpp"
-#include "../map/dungeon.hpp"
-#include "../events/eventbus.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../map/Map.hpp"
+#include "../map/Dungeon.hpp"
+#include "../events/EventBus.hpp"
 #include <string>
 
 

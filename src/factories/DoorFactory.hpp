@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../ecs/ecs.hpp"
-#include "../map/map.hpp"
+#include "../ecs/Ecs.hpp"
+#include "../map/Map.hpp"
 
 class DoorFactory {
 public:

@@ -1,4 +1,4 @@
-#include "door_factory.hpp"
+#include "DoorFactory.hpp"
 #include <cstdio>
 
 static constexpr int SCREEN_WIDTH = 1000;
