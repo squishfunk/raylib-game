@@ -11,9 +11,6 @@ Dungeon::Dungeon(ECS& ecs, Map &map, int playerId): playerId(playerId), ecs(ecs)
 
 void Dungeon::loadRoom(const Room& room, DoorFlags entryDoor){
     despawnCurrentRoom();
-    
-    currentRoom = Vector2{static_cast<float>(room.gridX), static_cast<float>(room.gridY)};
-    
     spawnRoom(room, entryDoor);
 }
 
@@ -22,7 +19,6 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
     auto* playerTransform = ecs.getTransform(playerId);
     assert(playerTransform != nullptr && "Player transform not found!");
 
-    // Sprawdź czy bounds są poprawne
     assert(room.bounds.width > 0 && room.bounds.height > 0 && "Room bounds are invalid!");
 
     Vector2 newPosition {};

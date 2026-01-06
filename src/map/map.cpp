@@ -6,6 +6,7 @@
 #include "../utils/helpers.hpp"
 #include <cstring>
 #include <cstdlib>
+#include <raylib.h>
 
 Map::Map() : startX(0), startY(0), currentX(0), currentY(0), generated(false) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
@@ -56,13 +57,17 @@ void Map::generate() {
     startY = currentY;
     this->currentX = currentX;
     this->currentY = currentY;
+
+    Rectangle roomBounds = Rectangle{0, 0, 1000.0f, 650.0f};
     
     rooms[currentY][currentX].type = RoomType::START;
     rooms[currentY][currentX].gridX = currentX;
     rooms[currentY][currentX].gridY = currentY;
     rooms[currentY][currentX].visited = true;
     rooms[currentY][currentX].cleared = false;
-    rooms[currentY][currentX].bounds = Rectangle{0, 0, 1000.0f, 650.0f}; 
+    rooms[currentY][currentX].bounds = roomBounds; 
+    rooms[currentY][currentX].enemySpawns = generateEnemySpawns(RoomType::START, roomBounds);
+
     
     for (int i = 1; i < pathLength; i++) {
         int directions[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
@@ -270,3 +275,100 @@ void Map::checkRoomCleared(Game& game) {
     }
 }
 
+std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectangle& bounds) {
+    std::vector<EnemySpawn> spawns;
+    
+    switch (roomType) {
+        case RoomType::START:
+            // Pokój startowy - może być pusty lub kilka słabych przeciwników
+            if (GetRandomValue(0, 100) < 30) { // 30% szansy na przeciwników
+                int count = GetRandomValue(1, 2);
+                for (int i = 0; i < count; i++) {
+                    float x = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.width) - 100));
+                    float y = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.height) - 100));
+                    spawns.push_back(EnemySpawn{Vector2{x, y}, EnemyType::NORMAL});
+                }
+            }
+            break;
+            
+        case RoomType::NORMAL:
+            // Zwykłe pokoje - losowa liczba przeciwników różnych typów
+            {
+                int count = GetRandomValue(2, 5);
+                for (int i = 0; i < count; i++) {
+                    float x = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.width) - 50));
+                    float y = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.height) - 50));
+                    
+                    // Losowy typ przeciwnika (NORMAL, FAST, TANK - bez BOSS)
+                    int typeRoll = GetRandomValue(0, 100);
+                    EnemyType type;
+                    if (typeRoll < 50) {
+                        type = EnemyType::NORMAL;
+                    } else if (typeRoll < 80) {
+                        type = EnemyType::FAST;
+                    } else {
+                        type = EnemyType::TANK;
+                    }
+                    
+                    spawns.push_back(EnemySpawn{Vector2{x, y}, type});
+                }
+            }
+            break;
+            
+        case RoomType::BOSS:
+            // Pokój bossa - jeden boss + kilka normalnych przeciwników
+            {
+                // Boss w centrum
+                spawns.push_back(EnemySpawn{
+                    Vector2{bounds.width / 2.0f, bounds.height / 2.0f}, 
+                    EnemyType::BOSS
+                });
+                
+                // 2-4 normalnych przeciwników wokół
+                int minionCount = GetRandomValue(2, 4);
+                for (int i = 0; i < minionCount; i++) {
+                    float angle = (i * 360.0f / minionCount) * DEG2RAD;
+                    float radius = 200.0f;
+                    float x = bounds.width / 2.0f + cosf(angle) * radius;
+                    float y = bounds.height / 2.0f + sinf(angle) * radius;
+                    
+                    // Upewnij się, że pozycja jest w granicach
+                    x = (x < 50) ? 50 : (x > bounds.width - 50) ? bounds.width - 50 : x;
+                    y = (y < 50) ? 50 : (y > bounds.height - 50) ? bounds.height - 50 : y;
+                    
+                    spawns.push_back(EnemySpawn{Vector2{x, y}, EnemyType::NORMAL});
+                }
+            }
+            break;
+            
+        case RoomType::TREASURE:
+            // Pokój skarbu - może być pusty lub kilka strażników
+            if (GetRandomValue(0, 100) < 60) { // 60% szansy na strażników
+                int count = GetRandomValue(1, 3);
+                for (int i = 0; i < count; i++) {
+                    float x = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.width) - 100));
+                    float y = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.height) - 100));
+                    spawns.push_back(EnemySpawn{Vector2{x, y}, EnemyType::TANK});
+                }
+            }
+            break;
+            
+        case RoomType::SECRET:
+            // Sekretny pokój - może być pusty lub specjalne przeciwniki
+            if (GetRandomValue(0, 100) < 40) {
+                int count = GetRandomValue(1, 2);
+                for (int i = 0; i < count; i++) {
+                    float x = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.width) - 50));
+                    float y = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.height) - 50));
+                    spawns.push_back(EnemySpawn{Vector2{x, y}, EnemyType::FAST});
+                }
+            }
+            break;
+            
+        case RoomType::EMPTY:
+        default:
+            break;
+    }
+    
+    return spawns;
+}

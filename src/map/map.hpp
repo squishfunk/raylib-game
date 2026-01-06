@@ -58,8 +58,17 @@ struct Room {
     Rectangle bounds;
     std::vector<EnemySpawn> enemySpawns;
     
-    Room() : type(RoomType::EMPTY), visited(false), cleared(false), 
-             doors(DoorFlags::NONE), gridX(0), gridY(0), bounds{0, 0, 0, 0} {}
+    Room() : 
+    type(RoomType::EMPTY), 
+    visited(false), cleared(false), 
+    doors(DoorFlags::NONE), 
+    gridX(0), 
+    gridY(0), 
+    bounds({0, 0, 0, 0}),
+    enemySpawns{}
+    {
+
+    }
 };
 
 class Map {
@@ -70,6 +79,7 @@ private:
     bool generated;
     
     void connectRooms(int x1, int y1, int x2, int y2);
+    static std::vector<EnemySpawn> generateEnemySpawns(RoomType roomType, const Rectangle& bounds);
     
 public:
     Map();

@@ -136,6 +136,9 @@ void Game::initGame(){
 }
 
 void Game::updatePlaying() {
+    if (IsKeyPressed(KEY_R)) {
+        initGame();
+    }
     if (IsKeyPressed(KEY_ESCAPE)) {
         currentState = GameState::PAUSED;
         return;
