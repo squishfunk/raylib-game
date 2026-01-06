@@ -159,6 +159,7 @@ void Map::renderMinimap(int screenX, int screenY) const {
             
             Color color = GRAY;
             if (room.type == RoomType::START) color = GREEN;
+            else if(room.cleared) color = BEIGE;
             else if (room.type == RoomType::BOSS) color = RED;
             else if (room.type == RoomType::TREASURE) color = GOLD;
             else if (room.visited) color = LIGHTGRAY;
@@ -181,37 +182,6 @@ void Map::renderMinimap(int screenX, int screenY) const {
         }
     }
 }
-
-// void Map::renderCurrentRoom(int screenWidth, int screenHeight) const {
-//     const Room& room = rooms[currentY][currentX];
-    
-//     int wallThickness = 20;
-//     Color color = (room.cleared) ? BROWN : BLACK;
-    
-//     if ((room.doors & DoorFlags::UP) != DoorFlags::UP) {
-//         DrawRectangle(0, 0, screenWidth, wallThickness, DARKGRAY);
-//     } else {
-//         DrawRectangle(screenWidth/2 - 50, 0, 100, wallThickness, color);
-//     }
-    
-//     if ((room.doors & DoorFlags::DOWN) != DoorFlags::DOWN) {
-//         DrawRectangle(0, screenHeight - wallThickness, screenWidth, wallThickness, DARKGRAY);
-//     } else {
-//         DrawRectangle(screenWidth/2 - 50, screenHeight - wallThickness, 100, wallThickness, color);
-//     }
-    
-//     if ((room.doors & DoorFlags::LEFT) != DoorFlags::LEFT) {
-//         DrawRectangle(0, 0, wallThickness, screenHeight, DARKGRAY);
-//     } else {
-//         DrawRectangle(0, screenHeight/2 - 50, wallThickness, 100, color);
-//     }
-    
-//     if ((room.doors & DoorFlags::RIGHT) != DoorFlags::RIGHT) {
-//         DrawRectangle(screenWidth - wallThickness, 0, wallThickness, screenHeight, DARKGRAY);
-//     } else {
-//         DrawRectangle(screenWidth - wallThickness, screenHeight/2 - 50, wallThickness, 100, color);
-//     }
-// }
 
 bool Map::canMoveTo(int newX, int newY) const {
     if (newX < 0 || newX >= MAP_WIDTH || newY < 0 || newY >= MAP_HEIGHT) return false;
@@ -257,29 +227,6 @@ void Map::moveToRoom(Game& game, int newX, int newY) {
     currentY = newY;
     rooms[newY][newX].visited = true;
 }
-
-// void Map::checkRoomCleared(Game& game) {
-//     ECS& ecs = game.getECS();
-//     Map& map = game.getMap();
-//     Room& currentRoom = map.getRoom(map.getCurrentX(), map.getCurrentY());
-    
-//     if (currentRoom.cleared) return;
-    
-//     bool hasActiveEnemies = false;
-//     const auto& entities = ecs.getEntities();
-//     int entityCount = ecs.getEntityCount();
-    
-//     for (int i = 0; i < entityCount; i++) {
-//         if (entities[i].active && (entities[i].tags & EntityTag::ENEMY) == EntityTag::ENEMY) {
-//             hasActiveEnemies = true;
-//             break;
-//         }
-//     }
-    
-//     if (!hasActiveEnemies) {
-//         currentRoom.cleared = true;
-//     }
-// }
 
 std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectangle& bounds) {
     std::vector<EnemySpawn> spawns;

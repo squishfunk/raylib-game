@@ -108,8 +108,6 @@ void Dungeon::onDoorCollision(const DoorCollisionEvent& event) {
     int currentY = map.getCurrentY();
     
     const Room& currentRoom = map.getRoom(currentX, currentY);
-    
-    checkRoomCleared();
 
     if (!currentRoom.cleared) {
         return;
@@ -160,26 +158,5 @@ DoorFlags Dungeon::getOppositeDoor(DoorFlags door) const {
             return DoorFlags::LEFT;
         default:
             return DoorFlags::NONE;
-    }
-}
-
-void Dungeon::checkRoomCleared() {
-    Room& currentRoom = map.getRoom(map.getCurrentX(), map.getCurrentY());
-    
-    if (currentRoom.cleared) return;
-    
-    bool hasActiveEnemies = false;
-    const auto& entities = ecs.getEntities();
-    int entityCount = ecs.getEntityCount();
-    
-    for (int i = 0; i < entityCount; i++) {
-        if (entities[i].active && (entities[i].tags & EntityTag::ENEMY) == EntityTag::ENEMY) {
-            hasActiveEnemies = true;
-            break;
-        }
-    }
-    
-    if (!hasActiveEnemies) {
-        currentRoom.cleared = true;
     }
 }

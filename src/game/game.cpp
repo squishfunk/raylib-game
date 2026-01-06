@@ -7,6 +7,7 @@
 #include "../systems/render_system.hpp"
 #include "../systems/bullet_system.hpp"
 #include "../systems/door_system.hpp"
+#include "../systems/room_system.hpp"
 #include "../factories/player_factory.hpp"
 #include "../map/map.hpp"
 #include "../map/dungeon.hpp"
@@ -149,9 +150,8 @@ void Game::updatePlaying() {
     MovementSystem::update(ecs);
     CollisionSystem::update(ecs);
     HealthSystem::update(ecs);
+    RoomSystem::update(ecs, map);
     DoorSystem::update(ecs, eventBus);
-    
-    // Map::checkRoomCleared(*this);
     
     if (!ecs.getEntities()[playerId].active) {
         currentState = GameState::GAME_OVER;
