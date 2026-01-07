@@ -2,13 +2,17 @@
 #define RENDER_SYSTEM_HPP
 
 class ECS;
+class Map;
 
 class RenderSystem {
 private:
     static void renderHealthbar(const ECS& ecs, int entityId);
+    static void renderMinimap(const Map& map, int screenX, int screenY);
+    static void renderECS(const ECS&);
     
 public:
-    static void render(const ECS& ecs);
+    static void render(const ECS& ecs, const Map &map);
+    static void renderUI(const ECS& ecs, const Map& map);
 };
 
 #endif // RENDER_SYSTEM_HPP

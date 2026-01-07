@@ -1,8 +1,59 @@
 #include "RenderSystem.hpp"
 #include "../ecs/Ecs.hpp"
 #include "../components/Components.hpp"
+#include "../map/Map.hpp"
 #include <cstdio>
 #include <raylib.h>
+
+void RenderSystem::renderMinimap(const Map& map, int screenX, int screenY) {
+    int cellSize = 15;
+    int offsetX = screenX;
+    int offsetY = screenY;
+    
+    int minimapWidth = MAP_WIDTH * cellSize + 4;
+    int minimapHeight = MAP_HEIGHT * cellSize + 4;
+    
+    DrawRectangle(offsetX - 2, offsetY - 2, minimapWidth, minimapHeight, BLACK);
+    DrawRectangleLines(offsetX - 2, offsetY - 2, minimapWidth, minimapHeight, BLACK);
+    
+    int currentX = map.getCurrentX();
+    int currentY = map.getCurrentY();
+    
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            const Room& room = map.getRoom(x, y);
+            
+            if (room.type == RoomType::EMPTY) continue;
+            
+            int px = offsetX + x * cellSize;
+            int py = offsetY + y * cellSize;
+            
+            Color color = GRAY;
+            if (room.type == RoomType::START) color = GREEN;
+            else if(room.cleared) color = BEIGE;
+            else if (room.type == RoomType::BOSS) color = RED;
+            else if (room.type == RoomType::TREASURE) color = GOLD;
+            else if (room.visited) color = LIGHTGRAY;
+            else color = DARKGRAY;
+            
+            if (x == currentX && y == currentY) {
+                color = YELLOW;
+            }
+            
+            DrawRectangle(px, py, cellSize - 2, cellSize - 2, color);
+            
+            if ((room.doors & DoorFlags::UP) == DoorFlags::UP) 
+                DrawLine(px + cellSize/2, py, px + cellSize/2, py - 3, WHITE);
+            if ((room.doors & DoorFlags::DOWN) == DoorFlags::DOWN) 
+                DrawLine(px + cellSize/2, py + cellSize, px + cellSize/2, py + cellSize + 3, WHITE);
+            if ((room.doors & DoorFlags::LEFT) == DoorFlags::LEFT) 
+                DrawLine(px, py + cellSize/2, px - 3, py + cellSize/2, WHITE);
+            if ((room.doors & DoorFlags::RIGHT) == DoorFlags::RIGHT) 
+                DrawLine(px + cellSize, py + cellSize/2, px + cellSize + 3, py + cellSize/2, WHITE);
+        }
+    }
+}
+
 
 void RenderSystem::renderHealthbar(const ECS& ecs, int entityId) {
     const auto& transforms = ecs.getTransforms();
@@ -24,7 +75,7 @@ void RenderSystem::renderHealthbar(const ECS& ecs, int entityId) {
     DrawRectangleLines(x, y, width, height, BLACK);
 }
 
-void RenderSystem::render(const ECS& ecs) {
+void RenderSystem::renderECS(const ECS& ecs){
     const auto& entities = ecs.getEntities();
     int entityCount = ecs.getEntityCount();
     const auto& transforms = ecs.getTransforms();
@@ -57,5 +108,10 @@ void RenderSystem::render(const ECS& ecs) {
             }
         }
     }
+}
+
+void RenderSystem::render(const ECS& ecs, const Map &map) {
+    renderECS(ecs);
+    renderMinimap(map, 10, 10);
 }
 

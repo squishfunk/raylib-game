@@ -127,7 +127,7 @@ void Map::generate() {
                 rooms[newY][newX].type == RoomType::EMPTY) {
                 
                 connectRooms(baseX, baseY, newX, newY);
-                rooms[newY][newX].type = RoomType::NORMAL;
+                rooms[newY][newX].type = RoomType::TREASURE;
                 rooms[newY][newX].gridX = newX;
                 rooms[newY][newX].gridY = newY;
                 rooms[newY][newX].bounds = roomBounds;

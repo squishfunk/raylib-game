@@ -144,7 +144,7 @@ void Game::updatePlaying() {
     if (IsKeyPressed(KEY_R)) {
         initGame();
     }
-    if (IsKeyPressed(KEY_ESCAPE)) {
+    if (IsKeyPressed(KEY_P)) {
         currentState = GameState::PAUSED;
         return;
     }
@@ -166,13 +166,11 @@ void Game::updatePlaying() {
 void Game::renderPlaying() const {
     ClearBackground(RAYWHITE);
 
-    RenderSystem::render(ecs);
-    
-    map.renderMinimap(10, 10);
+    RenderSystem::render(ecs, map);
 }
 
 void Game::updatePaused() {
-    if (IsKeyPressed(KEY_ESCAPE)) {
+    if (IsKeyPressed(KEY_P)) {
         currentState = GameState::PLAYING;
     }
     if (IsKeyPressed(KEY_Q)) {
@@ -182,7 +180,7 @@ void Game::updatePaused() {
 
 void Game::renderPaused() const {
     ClearBackground((Color){200, 200, 200, 255});
-    RenderSystem::render(ecs);
+    RenderSystem::render(ecs, map);
     
     DrawRectangle(0, 0, this->screenWidth, this->screenHeight, (Color){0, 0, 0, 150});
     
@@ -192,7 +190,7 @@ void Game::renderPaused() const {
     int y = this->screenHeight/2 - 50;
     DrawText(text, x, y, size, WHITE);
     
-    const char *resume = "Press ESC to resume";
+    const char *resume = "Press P to resume";
     int resumeSize = 30;
     int resumeX = this->screenWidth/2 - MeasureText(resume, resumeSize)/2;
     int resumeY = this->screenHeight/2 + 50;
