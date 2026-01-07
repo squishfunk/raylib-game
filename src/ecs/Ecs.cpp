@@ -142,6 +142,7 @@ void ECS::addShootable(int entityId, float shootingRange, float shootingSpeed, f
     shootables.get(entityId).shootingRange = shootingRange;
     shootables.get(entityId).shootingSpeed = shootingSpeed;
     shootables.get(entityId).shootCooldown = shootCooldown;
+    shootables.get(entityId).shoot = false;
     shootables.setActive(entityId, true);
 }
 

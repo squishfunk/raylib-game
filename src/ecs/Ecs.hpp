@@ -24,7 +24,15 @@ public:
     ComponentStorage() {
         active_flags.fill(false);
     }
+
+    std::array<T, MAX_ENTITIES> getData(){
+        return data;
+    }
     
+    std::array<bool, MAX_ENTITIES> getActiveFlags(){
+        return active_flags;
+    }
+
     void setActive(int entityId, bool value) {
         if (entityId >= 0 && entityId < MAX_ENTITIES) {
             active_flags[entityId] = value;

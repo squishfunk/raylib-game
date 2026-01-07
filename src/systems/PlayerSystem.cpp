@@ -55,28 +55,20 @@ void PlayerSystem::handleShooting(ECS& ecs, int playerId) {
     if (currentTime - shootable.lastShootTime < shootable.shootCooldown) return;
     
     const auto& playerTransform = ecs.getTransforms().get(playerId);
-    Vector2 position = playerTransform.position;
-    Vector2 velocity = {0, 0};
+    Vector2 direction = {0, 0};
     
-    if (IsKeyDown(KEY_UP)) velocity.y = -1.0f;
-    if (IsKeyDown(KEY_DOWN)) velocity.y = 1.0f;
-    if (IsKeyDown(KEY_LEFT)) velocity.x = -1.0f;
-    if (IsKeyDown(KEY_RIGHT)) velocity.x = 1.0f;
+    if (IsKeyDown(KEY_UP)) direction.y = -1.0f;
+    if (IsKeyDown(KEY_DOWN)) direction.y = 1.0f;
+    if (IsKeyDown(KEY_LEFT)) direction.x = -1.0f;
+    if (IsKeyDown(KEY_RIGHT)) direction.x = 1.0f;
 
-    velocity = Vector2Normalize(velocity);
-    
-    int bulletId = ecs.createEntity();
-    if (bulletId >= 0) {
-        ecs.addTransform(bulletId, position);
-        ecs.addVelocity(bulletId, velocity, shootable.shootingSpeed);
-        ecs.addRenderable(bulletId, BULLET_RADIUS, ORANGE);
-        ecs.getEntities()[bulletId].tags = EntityTag::BULLET;
-    }
+    direction = Vector2Normalize(direction);
     
     if (ecs.getAudios().isActive(playerId)) {
         PlaySound(ecs.getAudio(playerId)->shoot);
     }
     
-    shootable.lastShootTime = currentTime;
+    shootable.direction = direction;
+    shootable.shoot = true;
 }
 

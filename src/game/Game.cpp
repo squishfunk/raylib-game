@@ -9,6 +9,7 @@
 #include "../systems/DoorSystem.hpp"
 #include "../systems/RoomSystem.hpp"
 #include "../systems/DebugSystem.hpp"
+#include "../systems/ShootingSystem.hpp"
 #include "../factories/PlayerFactory.hpp"
 #include "../map/Map.hpp"
 #include "../map/Dungeon.hpp"
@@ -160,6 +161,7 @@ void Game::updatePlaying() {
     HealthSystem::update(ecs);
     RoomSystem::update(ecs, map);
     DoorSystem::update(ecs, eventBus);
+    ShootingSystem::update(ecs);
 
     if(DEBUG_MODE){
         DebugSystem::update(ecs, map, dungeonManager, playerId);

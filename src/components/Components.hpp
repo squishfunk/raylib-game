@@ -83,6 +83,8 @@ struct ShootableComponent {
     float shootingRange;
     float shootingSpeed;
     float shootCooldown;
+    Vector2 direction;
+    bool shoot;
 };
 
 struct AudioComponent {
