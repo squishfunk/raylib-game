@@ -1,6 +1,4 @@
 #include "Map.hpp"
-#include "../game/Game.hpp"
-#include "../ecs/Ecs.hpp"
 #include "../components/Components.hpp"
 #include <cstring>
 #include <cstdlib>
@@ -107,7 +105,6 @@ void Map::generate() {
     for (int e = 0; e < extraRooms; e++) {
         int baseX, baseY;
         int attempts = 0;
-        // search for existing room
         do {
             baseX = GetRandomValue(0, MAP_WIDTH - 1);
             baseY = GetRandomValue(0, MAP_HEIGHT - 1);

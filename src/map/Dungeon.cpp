@@ -27,6 +27,8 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
 
     assert(room.bounds.width > 0 && room.bounds.height > 0 && "Room bounds are invalid!");
 
+    map.setCurrentRoom(room.gridX, room.gridY);
+
     Vector2 newPosition {};
 
     switch(entryDoor){
@@ -140,12 +142,9 @@ void Dungeon::onDoorCollision(const DoorCollisionEvent& event) {
     
     assert(!((currentRoom.doors & event.doorDirection) == DoorFlags::NONE) && "Trying to move from room through non existing doors");
     
-    // Play door sound
     if (ecs.getAudios().isActive(event.entityId)) {
         PlaySound(ecs.getAudio(event.entityId)->shoot);
     }
-    
-    map.setCurrentRoom(newX, newY);
     
     DoorFlags entryDoor = getOppositeDoor(event.doorDirection);
     

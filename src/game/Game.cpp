@@ -8,12 +8,15 @@
 #include "../systems/BulletSystem.hpp"
 #include "../systems/DoorSystem.hpp"
 #include "../systems/RoomSystem.hpp"
+#include "../systems/DebugSystem.hpp"
 #include "../factories/PlayerFactory.hpp"
 #include "../map/Map.hpp"
 #include "../map/Dungeon.hpp"
 #include <cassert>
 #include <raylib.h>
 #include <cstdio>
+
+constexpr int DEBUG_MODE = 1;
 
 Game::Game(int screenWidth, int screenHeight, const std::string &gameName) : 
 screenWidth(screenWidth), 
@@ -157,6 +160,10 @@ void Game::updatePlaying() {
     HealthSystem::update(ecs);
     RoomSystem::update(ecs, map);
     DoorSystem::update(ecs, eventBus);
+
+    if(DEBUG_MODE){
+        DebugSystem::update(ecs, map, dungeonManager, playerId);
+    }
     
     if (!ecs.getEntities()[playerId].active) {
         currentState = GameState::GAME_OVER;
@@ -167,6 +174,10 @@ void Game::renderPlaying() const {
     ClearBackground(RAYWHITE);
 
     RenderSystem::render(ecs, map);
+
+    if(DEBUG_MODE){
+        DebugSystem::render(ecs, map, playerId, screenWidth, screenHeight);
+    }
 }
 
 void Game::updatePaused() {
