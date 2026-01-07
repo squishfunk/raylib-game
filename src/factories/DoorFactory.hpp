@@ -5,5 +5,5 @@
 
 class DoorFactory {
 public:
-    static int create(ECS& ecs, const DoorFlags doorFlag);
+    static int create(ECS& ecs, const DoorFlags doorFlag, bool opened);
 };

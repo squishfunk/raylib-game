@@ -111,7 +111,7 @@ public:
     EnemyComponent* getEnemy(int entityId);
     const EnemyComponent* getEnemy(int entityId) const;
     
-    void addDoor(int entityId, float width, float height, DoorFlags direction);
+    void addDoor(int entityId, float width, float height, DoorFlags direction, bool opened);
     DoorComponent* getDoor(int entityId);
     const DoorComponent* getDoor(int entityId) const;
     

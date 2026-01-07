@@ -28,6 +28,8 @@ void DoorSystem::update(ECS& ecs, EventBus& eventBus) {
         const auto& doorTransform = transforms.get(i);
         const auto& doorComponent = doors.get(i);
         
+        if (!doorComponent.opened) continue;
+        
         if (Helpers::checkCircleRectCollision(
             playerTransform.position, playerRenderable.radius,
             doorTransform.position, doorComponent.width, doorComponent.height)) {

@@ -136,7 +136,7 @@ void Game::initGame(){
     int startY = map.getStartY();
 
     const Room& startRoom = map.getRoom(startX, startY);
-    assert(startRoom.type == RoomType::START && "Error: Start room is EMPTY!");
+    assert(startRoom.type == RoomType::START && "Error: Start room is not a START room!");
 
     dungeonManager = new Dungeon(ecs, map, playerId, eventBus);
     dungeonManager->loadRoom(startRoom, DoorFlags::NONE);

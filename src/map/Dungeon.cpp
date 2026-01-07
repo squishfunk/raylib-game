@@ -55,10 +55,10 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
     }
     playerTransform->position = newPosition;
 
-    spawnDoors(room);
     if(!room.cleared){
         spawnEnemies(room);
     }
+    spawnDoors(room);
 }
 
 void Dungeon::despawnCurrentRoom() {
@@ -98,7 +98,7 @@ void Dungeon::spawnDoors(const Room& room) {
     
     for (DoorFlags doorFlag : allDoors) {
         if ((room.doors & doorFlag) != DoorFlags::NONE) {
-            int door = DoorFactory::create(ecs, doorFlag);
+            int door = DoorFactory::create(ecs, doorFlag, room.cleared);
             if (door != -1) {
                 currentRoomEntities.push_back(door);
             }

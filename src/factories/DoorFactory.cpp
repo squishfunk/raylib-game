@@ -7,7 +7,7 @@ static constexpr int SCREEN_HEIGHT = 650;
 static constexpr int DOOR_WIDTH = 80.0f;
 static constexpr int DOOR_HEIGHT = 20.0f;
 
-int DoorFactory::create(ECS& ecs, DoorFlags doorFlag) {
+int DoorFactory::create(ECS& ecs, DoorFlags doorFlag, bool opened) {
     if (doorFlag == DoorFlags::NONE) return -1;
 
     int doorId = ecs.createEntity();
@@ -49,7 +49,7 @@ int DoorFactory::create(ECS& ecs, DoorFlags doorFlag) {
     }
 
     ecs.addTransform(doorId, pos);
-    ecs.addDoor(doorId, width, height, doorFlag);
+    ecs.addDoor(doorId, width, height, doorFlag, opened);
     Sound doorSound = LoadSound("resources/sounds/door.wav");
     ecs.addAudio(doorId, "DOOR_SOUND", doorSound);
 

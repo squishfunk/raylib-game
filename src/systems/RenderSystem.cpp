@@ -92,7 +92,12 @@ void RenderSystem::renderECS(const ECS& ecs){
                 const TransformComponent &transform = transforms.get(i);
                 const auto& door = doors.get(i);
 
-                DrawRectangle(transform.position.x, transform.position.y, door.width, door.height, GRAY);
+                Color color = GRAY;
+                if(!door.opened){
+                    color = BLACK;
+                }
+
+                DrawRectangle(transform.position.x, transform.position.y, door.width, door.height, color);
             }else if (renderables.isActive(i)){
                 const TransformComponent &transform = transforms.get(i);
                 const auto& renderable = renderables.get(i);

@@ -25,7 +25,18 @@ void RoomSystem::updateClearedFlag(ECS& ecs, Map& map) {
     }
     
     if (!hasActiveEnemies) {
+        /* TODO Emit event */
         currentRoom.cleared = true;
+    }
+
+    
+    auto& doors = ecs.getDoors();
+    for (int i = 0; i < entityCount; i++) {
+        if (!entities[i].active) continue;
+        if (!doors.isActive(i)) continue;
+        
+        auto& doorComponent = doors.get(i);
+        doorComponent.opened = !hasActiveEnemies;
     }
 }
 

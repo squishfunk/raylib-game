@@ -96,13 +96,14 @@ public:
     
     int getCurrentX() const { return currentX; }
     int getCurrentY() const { return currentY; }
+    Room& getCurrentRoom() { return rooms[currentX][currentY]; }
     void setCurrentRoom(int x, int y) { currentX = x; currentY = y; }
     const Room& getRoom(int x, int y) const { return rooms[y][x]; }
     Room& getRoom(int x, int y) { return rooms[y][x]; }
     bool isGenerated() const { return generated; }
     
-    static void generateRoom(Game& game);
-    static void checkRoomCleared(Game& game);
+    static void generateRoom(Game& game); /*  TODO DELETE */
+    static void checkRoomCleared(Game& game); /*  TODO DELETE */
 };
 
 #endif // MAP_HPP

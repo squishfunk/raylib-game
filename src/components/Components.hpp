@@ -78,6 +78,7 @@ struct DoorComponent {
     float width;
     float height;
     DoorFlags direction;
+    bool opened;
 };
 
 struct ShootableComponent {
