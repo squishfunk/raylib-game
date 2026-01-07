@@ -17,8 +17,8 @@ void MovementSystem::update(ECS& ecs) {
         auto& transform = transforms.get(i);
         auto& velocity = velocities.get(i);
         
-        transform.position.x += velocity.velocity.x * deltaTime;
-        transform.position.y += velocity.velocity.y * deltaTime;
+        transform.position.x += velocity.velocity.x * velocity.speed * deltaTime;
+        transform.position.y += velocity.velocity.y * velocity.speed * deltaTime;
     }
 }
 

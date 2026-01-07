@@ -66,8 +66,9 @@ const TransformComponent* ECS::getTransform(int entityId) const {
     return transforms.getPtr(entityId);
 }
 
-void ECS::addVelocity(int entityId, Vector2 velocity) {
+void ECS::addVelocity(int entityId, Vector2 velocity, float speed) {
     velocities.get(entityId).velocity = velocity;
+    velocities.get(entityId).speed = speed;
     velocities.setActive(entityId, true);
 }
 

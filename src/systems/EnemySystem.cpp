@@ -38,15 +38,13 @@ void EnemySystem::update(ECS& ecs) {
         Vector2 enemyPos = transforms.get(i).position;
         Vector2 playerPos = playerTransform.position;
         
-        float speed = 200.0f;
-        
         Vector2 direction = Vector2Subtract(playerPos, enemyPos);
         
         float length = Vector2Length(direction);
         if (length < 0.001f) {
             velocities.get(i).velocity = Vector2{0, 0};
         } else {
-            Vector2 velocity = Vector2Scale(Vector2Normalize(direction), speed);
+            Vector2 velocity = Vector2Normalize(direction);
             velocities.get(i).velocity = velocity;
         }
         

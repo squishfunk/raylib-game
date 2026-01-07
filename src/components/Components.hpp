@@ -8,7 +8,7 @@ enum class DoorFlags : uint8_t;
 
 
 constexpr int MAX_ENTITIES = 1024;
-constexpr float MOVEMENT_SPEED = 350.0f;
+constexpr float MOVEMENT_SPEED = 400.0f;
 constexpr float SHOOT_COOLDOWN = 0.25f;
 constexpr float BULLET_SPEED = 200.0f;
 constexpr float BULLET_RADIUS = 5.0f;
@@ -22,6 +22,7 @@ struct TransformComponent {
 
 struct VelocityComponent {
     Vector2 velocity;
+    float speed;
 };
 
 struct RenderableComponent {
@@ -44,7 +45,6 @@ enum class EnemyType {
 
 struct EnemyComponent {
     EnemyType type;
-    float movementSpeed;
     int damage;
     float attackCooldown;
     float lastAttackTime;

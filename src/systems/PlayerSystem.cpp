@@ -24,10 +24,12 @@ void PlayerSystem::handleInput(ECS& ecs, int playerId) {
     auto& velocity = ecs.getVelocities().get(playerId);
     Vector2 targetVelocity = {0, 0};
     
-    if (IsKeyDown(KEY_W)) targetVelocity.y = -MOVEMENT_SPEED;
-    if (IsKeyDown(KEY_S)) targetVelocity.y = MOVEMENT_SPEED;
-    if (IsKeyDown(KEY_A)) targetVelocity.x = -MOVEMENT_SPEED;
-    if (IsKeyDown(KEY_D)) targetVelocity.x = MOVEMENT_SPEED;
+    if (IsKeyDown(KEY_W)) targetVelocity.y = -1.0;
+    if (IsKeyDown(KEY_S)) targetVelocity.y = 1.0;
+    if (IsKeyDown(KEY_A)) targetVelocity.x = -1.0;
+    if (IsKeyDown(KEY_D)) targetVelocity.x = 1.0;
+
+    targetVelocity = Vector2Normalize(targetVelocity);
     
     Vector2 currentVel = velocity.velocity;
     
@@ -56,15 +58,17 @@ void PlayerSystem::handleShooting(ECS& ecs, int playerId) {
     Vector2 position = playerTransform.position;
     Vector2 velocity = {0, 0};
     
-    if (IsKeyDown(KEY_UP)) velocity.y = -shootable.shootingSpeed;
-    if (IsKeyDown(KEY_DOWN)) velocity.y = shootable.shootingSpeed;
-    if (IsKeyDown(KEY_LEFT)) velocity.x = -shootable.shootingSpeed;
-    if (IsKeyDown(KEY_RIGHT)) velocity.x = shootable.shootingSpeed;
+    if (IsKeyDown(KEY_UP)) velocity.y = -1.0f;
+    if (IsKeyDown(KEY_DOWN)) velocity.y = 1.0f;
+    if (IsKeyDown(KEY_LEFT)) velocity.x = -1.0f;
+    if (IsKeyDown(KEY_RIGHT)) velocity.x = 1.0f;
+
+    velocity = Vector2Normalize(velocity);
     
     int bulletId = ecs.createEntity();
     if (bulletId >= 0) {
         ecs.addTransform(bulletId, position);
-        ecs.addVelocity(bulletId, velocity);
+        ecs.addVelocity(bulletId, velocity, shootable.shootingSpeed);
         ecs.addRenderable(bulletId, BULLET_RADIUS, ORANGE);
         ecs.getEntities()[bulletId].tags = EntityTag::BULLET;
     }

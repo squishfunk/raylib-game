@@ -87,7 +87,7 @@ public:
     TransformComponent* getTransform(int entityId);
     const TransformComponent* getTransform(int entityId) const;
     
-    void addVelocity(int entityId, Vector2 velocity);
+    void addVelocity(int entityId, Vector2 velocity, float speed = MOVEMENT_SPEED);
     VelocityComponent* getVelocity(int entityId);
     const VelocityComponent* getVelocity(int entityId) const;
     

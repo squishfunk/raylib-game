@@ -12,7 +12,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         .color = RED,
         .health = 100,
         .maxHealth = 100,
-        .movementSpeed = 200.0f,
+        .movementSpeed = 240.0f,
         .damage = 10,
         .attackCooldown = 1.0f
     },
@@ -22,7 +22,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         .color = ORANGE,
         .health = 80,
         .maxHealth = 80,
-        .movementSpeed = 300.0f,
+        .movementSpeed = 400.0f,
         .damage = 8,
         .attackCooldown = 0.8f
     },
@@ -38,12 +38,12 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
     },
     // ENEMY_TYPE_BOSS
     {
-        .radius = 30.0f,
+        .radius = 50.0f,
         .color = PURPLE,
-        .health = 500,
-        .maxHealth = 500,
-        .movementSpeed = 150.0f,
-        .damage = 25,
+        .health = 1000,
+        .maxHealth = 1000,
+        .movementSpeed = 240.0f,
+        .damage = 80,
         .attackCooldown = 0.5f
     }
 };
@@ -68,16 +68,15 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
     position.y = (position.y - config->radius < 0) ? config->radius : position.y;
     
     ecs.addTransform(enemyId, position);
-    ecs.addVelocity(enemyId, Vector2{0, 0});
+    ecs.addVelocity(enemyId, Vector2{0, 0}, config->movementSpeed);
     ecs.addRenderable(enemyId, config->radius, config->color);
     ecs.addHealth(enemyId, config->health, config->maxHealth);
     
     float currentTime = GetTime();
-    float randomDelay = 1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f)); // 1-5 seconds
+    float randomDelay = 1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f));
     
     EnemyComponent enemyComp = {
         .type = data.type,
-        .movementSpeed = config->movementSpeed,
         .damage = config->damage,
         .attackCooldown = config->attackCooldown,
         .lastAttackTime = 0.0f,
