@@ -65,7 +65,7 @@ void PlayerSystem::handleShooting(ECS& ecs, int playerId) {
     direction = Vector2Normalize(direction);
     
     if (ecs.getAudios().isActive(playerId)) {
-        PlaySound(ecs.getAudio(playerId)->shoot);
+        ecs.getAudio(playerId)->play("SHOOT_SOUND");
     }
     
     shootable.direction = direction;

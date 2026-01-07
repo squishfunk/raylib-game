@@ -15,7 +15,7 @@ int PlayerFactory::create(ECS& ecs, const Vector2 position) {
     ecs.addHealth(playerId, 100, 100);
     ecs.addShootable(playerId, 1000.0f, BULLET_SPEED, SHOOT_COOLDOWN);
     Sound shoot = LoadSound("resources/sounds/shoot.wav");
-    ecs.addAudio(playerId, shoot);
+    ecs.addAudio(playerId, "SHOOT_SOUND", shoot);
     ecs.getEntities()[playerId].tags = EntityTag::PLAYER;
     return playerId;
 }

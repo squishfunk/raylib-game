@@ -46,7 +46,7 @@ void BulletSystem::update(ECS& ecs, int screenWidth, int screenHeight) {
                 
                 // Play hit sound
                 if (ecs.getAudios().isActive(j)) {
-                    PlaySound(ecs.getAudio(j)->hit);
+                    ecs.getAudio(j)->play("HIT_SOUND");
                 }
                 
                 printf("Enemy id: %d Hit. Current health: %d \n", j, enemyHealth.healthPoints);

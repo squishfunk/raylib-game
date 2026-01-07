@@ -154,23 +154,8 @@ const ShootableComponent* ECS::getShootable(int entityId) const {
     return shootables.getPtr(entityId);
 }
 
-void ECS::addAudio(int entityId, Sound sound) {
-    audios.get(entityId).shoot = sound;
-    // Initialize empty sounds
-    Sound emptySound = {0};
-    audios.get(entityId).idle = emptySound;
-    audios.get(entityId).hit = emptySound;
-    audios.get(entityId).die = emptySound;
-    audios.setActive(entityId, true);
-}
-
-void ECS::addAudio(int entityId, Sound idle, Sound hit, Sound die) {
-    // Initialize empty sound for shoot
-    Sound emptySound = {0};
-    audios.get(entityId).shoot = emptySound;
-    audios.get(entityId).idle = idle;
-    audios.get(entityId).hit = hit;
-    audios.get(entityId).die = die;
+void ECS::addAudio(int entityId, const std::string& soundKey, Sound sound) {
+    audios.get(entityId).addSound(soundKey, sound);
     audios.setActive(entityId, true);
 }
 

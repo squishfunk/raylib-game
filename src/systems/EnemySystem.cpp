@@ -60,7 +60,7 @@ void EnemySystem::update(ECS& ecs) {
             
             // Play sound if time has come
             if (currentTime >= enemy.nextSoundTime) {
-                PlaySound(audios.get(i).idle);
+                audios.get(i).play("IDLE_SOUND");
                 enemy.lastSoundTime = currentTime;
                 // Set next random sound time (1-5 seconds)
                 float randomDelay = 1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f));

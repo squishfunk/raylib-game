@@ -3,6 +3,8 @@
 
 #include <raylib.h>
 #include <cstdint>
+#include <unordered_map>
+#include <string>
 
 enum class DoorFlags : uint8_t;
 
@@ -88,10 +90,32 @@ struct ShootableComponent {
 };
 
 struct AudioComponent {
-    Sound shoot;  // For player and doors
-    Sound idle;   // For enemies - idle sounds
-    Sound hit;    // For enemies - hit sound
-    Sound die;    // For enemies - death sound
+    std::unordered_map<std::string, Sound> sounds;
+    
+    void addSound(const std::string& key, Sound sound) {
+        sounds[key] = sound;
+    }
+    
+    Sound getSound(const std::string& key) const {
+        auto it = sounds.find(key);
+        if (it != sounds.end() && it->second.frameCount > 0) {
+            return it->second;
+        }
+        Sound emptySound = {};
+        return emptySound; 
+    }
+    
+    bool hasSound(const std::string& key) const {
+        auto it = sounds.find(key);
+        return it != sounds.end() && it->second.frameCount > 0;
+    }
+    
+    void play(const std::string& key) const {
+        auto it = sounds.find(key);
+        if (it != sounds.end() && it->second.frameCount > 0) {
+            PlaySound(it->second);
+        }
+    }
 };
 
 struct EnemyConfig {

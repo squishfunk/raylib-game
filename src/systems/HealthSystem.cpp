@@ -17,7 +17,7 @@ void HealthSystem::update(ECS& ecs) {
         if (healths.get(i).healthPoints <= 0) {
             // Play death sound for enemies
             if ((entities[i].tags & EntityTag::ENEMY) == EntityTag::ENEMY && audios.isActive(i)) {
-                PlaySound(audios.get(i).die);
+                audios.get(i).play("DIE_SOUND");
             }
             
             ecs.getEntities()[i].active = false;

@@ -119,8 +119,7 @@ public:
     ShootableComponent* getShootable(int entityId);
     const ShootableComponent* getShootable(int entityId) const;
     
-    void addAudio(int entityId, Sound sound);  // For player and doors (shoot only)
-    void addAudio(int entityId, Sound idle, Sound hit, Sound die);  // For enemies (all sounds)
+    void addAudio(int entityId, const std::string& soundKey, Sound sound);
     AudioComponent* getAudio(int entityId);
     const AudioComponent* getAudio(int entityId) const;
     

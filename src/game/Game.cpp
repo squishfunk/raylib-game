@@ -164,6 +164,7 @@ void Game::updatePlaying() {
     ShootingSystem::update(ecs);
 
     if(DEBUG_MODE){
+        SetMasterVolume(0.0f);
         DebugSystem::update(ecs, map, dungeonManager, playerId);
     }
     

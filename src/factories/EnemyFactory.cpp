@@ -88,7 +88,9 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
     Sound idle = LoadSound("resources/sounds/enemy_idle.wav");
     Sound hit = LoadSound("resources/sounds/enemy_hit.wav");
     Sound die = LoadSound("resources/sounds/enemy_die.wav");
-    ecs.addAudio(enemyId, idle, hit, die);
+    ecs.addAudio(enemyId, "IDLE_SOUND", idle);
+    ecs.addAudio(enemyId, "HIT_SOUND", hit);
+    ecs.addAudio(enemyId, "DIE_SOUND", die);
     ecs.getEntities()[enemyId].tags = EntityTag::ENEMY;
     
     return enemyId;

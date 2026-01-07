@@ -143,7 +143,7 @@ void Dungeon::onDoorCollision(const DoorCollisionEvent& event) {
     assert(!((currentRoom.doors & event.doorDirection) == DoorFlags::NONE) && "Trying to move from room through non existing doors");
     
     if (ecs.getAudios().isActive(event.entityId)) {
-        PlaySound(ecs.getAudio(event.entityId)->shoot);
+        ecs.getAudio(event.entityId)->play("DOOR_SOUND");
     }
     
     DoorFlags entryDoor = getOppositeDoor(event.doorDirection);
