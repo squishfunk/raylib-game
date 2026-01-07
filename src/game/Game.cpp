@@ -2,7 +2,9 @@
 #include "../systems/PlayerSystem.hpp"
 #include "../systems/EnemySystem.hpp"
 #include "../systems/MovementSystem.hpp"
-#include "../systems/CollisionSystem.hpp"
+#include "../systems/CollisionDetectionSystem.hpp"
+#include "../systems/CollisionResponseSystem.hpp"
+#include "../systems/DamageSystem.hpp"
 #include "../systems/HealthSystem.hpp"
 #include "../systems/RenderSystem.hpp"
 #include "../systems/BulletSystem.hpp"
@@ -141,6 +143,8 @@ void Game::initGame(){
     dungeonManager = new Dungeon(ecs, map, playerId, eventBus);
     dungeonManager->loadRoom(startRoom, DoorFlags::NONE);
 
+    DamageSystem::init(ecs, eventBus);
+
     currentState = GameState::PLAYING;
 }
 
@@ -154,10 +158,10 @@ void Game::updatePlaying() {
     }
     
     PlayerSystem::update(ecs);
-    BulletSystem::update(ecs, screenHeight, screenWidth);
+    BulletSystem::update(ecs, screenWidth, screenHeight);
     EnemySystem::update(ecs);
     MovementSystem::update(ecs);
-    CollisionSystem::update(ecs);
+    CollisionDetectionSystem::update(ecs, eventBus);
     HealthSystem::update(ecs);
     RoomSystem::update(ecs, map);
     DoorSystem::update(ecs, eventBus);

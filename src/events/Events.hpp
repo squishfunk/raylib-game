@@ -11,5 +11,13 @@ struct DoorCollisionEvent {
         : entityId(id), doorDirection(direction) {}
 };
 
+struct CircleCollisionEvent {
+    int entityId1;
+    int entityId2;
+    
+    CircleCollisionEvent(int id1, int id2) 
+        : entityId1(id1), entityId2(id2) {}
+};
+
 #endif // EVENTS_HPP
 

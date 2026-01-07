@@ -70,6 +70,7 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
     ecs.addTransform(enemyId, position);
     ecs.addVelocity(enemyId, Vector2{0, 0}, config->movementSpeed);
     ecs.addRenderable(enemyId, config->radius, config->color);
+    ecs.addCircleCollider(enemyId, config->radius, false);
     ecs.addHealth(enemyId, config->health, config->maxHealth);
     
     float currentTime = GetTime();

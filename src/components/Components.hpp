@@ -119,6 +119,11 @@ struct AudioComponent {
     }
 };
 
+struct CircleColliderComponent {
+    float radius;
+    bool isTrigger = false;
+};
+
 struct EnemyConfig {
     float radius;
     Color color;

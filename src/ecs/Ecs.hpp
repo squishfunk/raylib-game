@@ -82,6 +82,7 @@ private:
     ComponentStorage<DoorComponent> doors;
     ComponentStorage<ShootableComponent> shootables;
     ComponentStorage<AudioComponent> audios;
+    ComponentStorage<CircleColliderComponent> circleColliders;
     
 public:
     ECS() : entityCount(0) {
@@ -123,6 +124,10 @@ public:
     AudioComponent* getAudio(int entityId);
     const AudioComponent* getAudio(int entityId) const;
     
+    void addCircleCollider(int entityId, float radius, bool isTrigger = false);
+    CircleColliderComponent* getCircleCollider(int entityId);
+    const CircleColliderComponent* getCircleCollider(int entityId) const;
+    
     const std::array<Entity, MAX_ENTITIES>& getEntities() const { return entities; }
     std::array<Entity, MAX_ENTITIES>& getEntities() { return entities; }
     int getEntityCount() const { return entityCount; }
@@ -150,6 +155,9 @@ public:
     
     ComponentStorage<AudioComponent>& getAudios() { return audios; }
     const ComponentStorage<AudioComponent>& getAudios() const { return audios; }
+    
+    ComponentStorage<CircleColliderComponent>& getCircleColliders() { return circleColliders; }
+    const ComponentStorage<CircleColliderComponent>& getCircleColliders() const { return circleColliders; }
 };
 
 #endif // ECS_HPP

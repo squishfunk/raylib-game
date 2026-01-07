@@ -14,6 +14,7 @@ int ECS::createEntity() {
             doors.setActive(i, false);
             shootables.setActive(i, false);
             audios.setActive(i, false);
+            circleColliders.setActive(i, false);
             return i;
         }
     }
@@ -34,6 +35,7 @@ int ECS::createEntity() {
     doors.setActive(entityId, false);
     shootables.setActive(entityId, false);
     audios.setActive(entityId, false);
+    circleColliders.setActive(entityId, false);
     
     return entityId;
 }
@@ -51,6 +53,7 @@ void ECS::destroyEntity(int entityId) {
     doors.setActive(entityId, false);
     shootables.setActive(entityId, false);
     audios.setActive(entityId, false);
+    circleColliders.setActive(entityId, false);
 }
 
 void ECS::addTransform(int entityId, Vector2 position) {
@@ -166,5 +169,21 @@ AudioComponent* ECS::getAudio(int entityId) {
 
 const AudioComponent* ECS::getAudio(int entityId) const {
     return audios.getPtr(entityId);
+}
+
+void ECS::addCircleCollider(int entityId, float radius, bool isTrigger) {
+    if (entityId >= 0 && entityId < MAX_ENTITIES) {
+        circleColliders.get(entityId).radius = radius;
+        circleColliders.get(entityId).isTrigger = isTrigger;
+        circleColliders.setActive(entityId, true);
+    }
+}
+
+CircleColliderComponent* ECS::getCircleCollider(int entityId) {
+    return circleColliders.getPtr(entityId);
+}
+
+const CircleColliderComponent* ECS::getCircleCollider(int entityId) const {
+    return circleColliders.getPtr(entityId);
 }
 

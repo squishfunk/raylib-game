@@ -6,6 +6,7 @@ int BulletFactory::create(ECS& ecs, Vector2 position, Vector2 velocity, float sp
         ecs.addTransform(bulletId, position);
         ecs.addVelocity(bulletId, velocity, speed);
         ecs.addRenderable(bulletId, BULLET_RADIUS, ORANGE);
+        ecs.addCircleCollider(bulletId, BULLET_RADIUS, true);
         ecs.getEntities()[bulletId].tags = EntityTag::BULLET;
     }
     return bulletId;
