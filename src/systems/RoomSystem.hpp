@@ -6,7 +6,7 @@ class Map;
 
 class RoomSystem {
 private:
-    static void updateEntitiesPositionsToRoomBounds(ECS &ecs, Map &map);
+    static void updateEntitiesPositionsToRoomBounds(ECS &ecs);
     static void updateClearedFlag(ECS &ecs, Map &map);
 public:
     static void update(ECS& ecs, Map& map);

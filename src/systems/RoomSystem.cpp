@@ -29,11 +29,10 @@ void RoomSystem::updateClearedFlag(ECS& ecs, Map& map) {
     }
 }
 
-void RoomSystem::updateEntitiesPositionsToRoomBounds(ECS &ecs, Map &map){
+void RoomSystem::updateEntitiesPositionsToRoomBounds(ECS &ecs){
     int entityCount = ecs.getEntityCount();
 
     const auto& entities = ecs.getEntities();
-    const auto& transforms = ecs.getTransforms();
 
     for (int i = 0; i < entityCount; i++){
         if(!entities[i].active) continue;
@@ -56,6 +55,6 @@ void RoomSystem::updateEntitiesPositionsToRoomBounds(ECS &ecs, Map &map){
 
 void RoomSystem::update(ECS& ecs, Map& map) {
     updateClearedFlag(ecs, map);
-    updateEntitiesPositionsToRoomBounds(ecs, map);
+    updateEntitiesPositionsToRoomBounds(ecs);
 }
 

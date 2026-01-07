@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <raylib.h>
+#include <math.h>
 
 Map::Map() : startX(0), startY(0), currentX(0), currentY(0), generated(false) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
