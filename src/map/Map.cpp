@@ -2,8 +2,6 @@
 #include "../game/Game.hpp"
 #include "../ecs/Ecs.hpp"
 #include "../components/Components.hpp"
-#include "../systems/EnemySystem.hpp"
-#include "../utils/Helpers.hpp"
 #include <cstring>
 #include <cstdlib>
 #include <raylib.h>
@@ -50,13 +48,14 @@ void Map::generate() {
     init();
     
     int pathLength = 8 + GetRandomValue(0, 5);
-    int currentX = MAP_WIDTH / 2;
-    int currentY = MAP_HEIGHT / 2;
     
-    startX = currentX;
-    startY = currentY;
-    this->currentX = currentX;
-    this->currentY = currentY;
+    // 2
+    startX = MAP_WIDTH / 2;
+    // 2
+    startY = MAP_HEIGHT / 2;
+
+    currentX = startX;
+    currentY = startY;
 
     Rectangle roomBounds = Rectangle{0, 0, 1000.0f, 650.0f};
     
@@ -67,17 +66,16 @@ void Map::generate() {
     rooms[currentY][currentX].cleared = false;
     rooms[currentY][currentX].bounds = roomBounds; 
     rooms[currentY][currentX].enemySpawns = generateEnemySpawns(RoomType::START, roomBounds);
-
     
     for (int i = 1; i < pathLength; i++) {
-        int directions[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+        int allPosibleDirections[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
         int attempts = 0;
         int newX, newY;
         
         do {
             int dir = GetRandomValue(0, 3);
-            newX = currentX + directions[dir][0];
-            newY = currentY + directions[dir][1];
+            newX = currentX + allPosibleDirections[dir][0];
+            newY = currentY + allPosibleDirections[dir][1];
             attempts++;
         } while ((newX < 0 || newX >= MAP_WIDTH || 
                  newY < 0 || newY >= MAP_HEIGHT ||
@@ -108,6 +106,7 @@ void Map::generate() {
     for (int e = 0; e < extraRooms; e++) {
         int baseX, baseY;
         int attempts = 0;
+        // search for existing room
         do {
             baseX = GetRandomValue(0, MAP_WIDTH - 1);
             baseY = GetRandomValue(0, MAP_HEIGHT - 1);
@@ -117,9 +116,11 @@ void Map::generate() {
         if (attempts < 50) {
             int directions[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
             int dir = GetRandomValue(0, 3);
+
             int newX = baseX + directions[dir][0];
             int newY = baseY + directions[dir][1];
-            
+
+            // check for 1 random empty room around finded room
             if (newX >= 0 && newX < MAP_WIDTH && 
                 newY >= 0 && newY < MAP_HEIGHT &&
                 rooms[newY][newX].type == RoomType::EMPTY) {
@@ -129,10 +130,13 @@ void Map::generate() {
                 rooms[newY][newX].gridX = newX;
                 rooms[newY][newX].gridY = newY;
                 rooms[newY][newX].bounds = roomBounds;
-                rooms[currentY][currentX].enemySpawns = generateEnemySpawns(RoomType::START, roomBounds);
+                rooms[newY][newY].enemySpawns = generateEnemySpawns(RoomType::START, roomBounds);
             }
         }
     }
+
+    currentX = startX;
+    currentY = startY;
     
     generated = true;
 }
@@ -181,51 +185,6 @@ void Map::renderMinimap(int screenX, int screenY) const {
                 DrawLine(px + cellSize, py + cellSize/2, px + cellSize + 3, py + cellSize/2, WHITE);
         }
     }
-}
-
-bool Map::canMoveTo(int newX, int newY) const {
-    if (newX < 0 || newX >= MAP_WIDTH || newY < 0 || newY >= MAP_HEIGHT) return false;
-    
-    const Room& currentRoom = rooms[currentY][currentX];
-    const Room& targetRoom = rooms[newY][newX];
-    
-    if (targetRoom.type == RoomType::EMPTY) return false;
-    
-    if (newX > currentX && (currentRoom.doors & DoorFlags::RIGHT) != DoorFlags::RIGHT) return false;
-    if (newX < currentX && (currentRoom.doors & DoorFlags::LEFT) != DoorFlags::LEFT) return false;
-    if (newY > currentY && (currentRoom.doors & DoorFlags::DOWN) != DoorFlags::DOWN) return false;
-    if (newY < currentY && (currentRoom.doors & DoorFlags::UP) != DoorFlags::UP) return false;
-    
-    if (!currentRoom.cleared) return false;
-    
-    return true;
-}
-
-void Map::moveToRoom(Game& game, int newX, int newY) {
-    if (!canMoveTo(newX, newY)) return;
-    
-    ECS& ecs = game.getECS();
-    int playerId = game.getPlayerId();
-    
-    auto* playerTransform = ecs.getTransform(playerId);
-    if (!playerTransform) return;
-    
-    const auto& entities = ecs.getEntities();
-    int entityCount = ecs.getEntityCount();
-    
-    for (int i = 0; i < entityCount; i++) {
-        if (entities[i].active) {
-            EntityTag tags = entities[i].tags;
-            if ((tags & EntityTag::BULLET) == EntityTag::BULLET || 
-                (tags & EntityTag::ENEMY) == EntityTag::ENEMY) {
-                ecs.getEntities()[i].active = false;
-            }
-        }
-    }
-    
-    currentX = newX;
-    currentY = newY;
-    rooms[newY][newX].visited = true;
 }
 
 std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectangle& bounds) {

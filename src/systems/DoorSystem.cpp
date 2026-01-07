@@ -31,10 +31,9 @@ void DoorSystem::update(ECS& ecs, EventBus& eventBus) {
         if (Helpers::checkCircleRectCollision(
             playerTransform.position, playerRenderable.radius,
             doorTransform.position, doorComponent.width, doorComponent.height)) {
-            
             DoorCollisionEvent event(i, doorComponent.direction);
             eventBus.emit(event);
+            return;
         }
     }
 }
-

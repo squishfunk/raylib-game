@@ -118,8 +118,11 @@ void Game::renderMenu() const {
 }
 
 void Game::initGame(){
+    delete dungeonManager;
+
     ecs = ECS();
-    
+    eventBus = EventBus();
+
     map.init();
     map.generate();
 
