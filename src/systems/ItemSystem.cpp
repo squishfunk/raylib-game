@@ -43,7 +43,7 @@ void ItemSystem::init(ECS& ecs, EventBus& eventBus) {
         
         item->isPickedUp = true;
         
-        RenderSystem::setPickedUpItemName(event.itemName);
+        RenderSystem::setPickedUpItemName(item->name);
         
         ecs.destroyEntity(itemId);
     });

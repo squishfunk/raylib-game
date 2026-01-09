@@ -39,9 +39,7 @@ void PickupSystem::update(ECS& ecs, EventBus& eventBus) {
             playerTransform.position, playerCollider.radius,
             itemTransform.position, itemCollider.radius)) {
             
-            // Emituj event z nazwą itemu
-            std::string itemName = item.name.empty() ? "Item" : item.name;
-            ItemPickupEvent event(playerId, i, itemName);
+            ItemPickupEvent event(playerId, i);
             eventBus.emit(event);
         }
     }

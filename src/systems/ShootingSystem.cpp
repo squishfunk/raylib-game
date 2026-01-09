@@ -3,6 +3,7 @@
 #include "../factories/BulletFactory.hpp"
 #include "../components/Components.hpp"
 #include "../components/BehaviourEffects.hpp"
+#include <cassert>
 #include <cstdio>
 #include <raylib.h>
 #include <cmath>
@@ -52,40 +53,40 @@ void ShootingSystem::shoot(ECS& ecs){
                 
                 if (behaviourModifiers.isActive(i) && isPlayerShooting) {
                     const auto* behaviourModifier = ecs.getBehaviourModifier(i);
-                    if (behaviourModifier) {
-                        for (const auto& effect : behaviourModifier->effects) {
-                            if (!effect) continue;
-                            
-                            BehaviourEffectType effectType = effect->getType();
-                            
-                            if (effectType == BehaviourEffectType::DOUBLE_SHOT) {
-                                auto* doubleShot = dynamic_cast<DoubleShotEffect*>(effect.get());
-                                if (doubleShot) {
-                                    float angle = doubleShot->spreadAngle;
-                                    float length = sqrtf(baseDirection.x * baseDirection.x + baseDirection.y * baseDirection.y);
-                                    if (length > 0.0f) {
-                                        Vector2 normalized = {baseDirection.x / length, baseDirection.y / length};
-                                        float baseAngle = atan2f(normalized.y, normalized.x);
-                                        shotDirections.push_back({cosf(baseAngle - angle/2.0f), sinf(baseAngle - angle/2.0f)});
-                                        shotDirections.push_back({cosf(baseAngle + angle/2.0f), sinf(baseAngle + angle/2.0f)});
-                                    }
+                    assert(behaviourModifier && "The flag of BehaviourModifier is active and pointer is null");
+                    
+                    for (const auto& effect : behaviourModifier->effects) {
+                        if (!effect) continue;
+                        
+                        BehaviourEffectType effectType = effect->getType();
+                        
+                        if (effectType == BehaviourEffectType::DOUBLE_SHOT) {
+                            auto* doubleShot = dynamic_cast<DoubleShotEffect*>(effect.get());
+                            if (doubleShot) {
+                                float angle = doubleShot->spreadAngle;
+                                float length = sqrtf(baseDirection.x * baseDirection.x + baseDirection.y * baseDirection.y);
+                                if (length > 0.0f) {
+                                    Vector2 normalized = {baseDirection.x / length, baseDirection.y / length};
+                                    float baseAngle = atan2f(normalized.y, normalized.x);
+                                    shotDirections.push_back({cosf(baseAngle - angle/2.0f), sinf(baseAngle - angle/2.0f)});
+                                    shotDirections.push_back({cosf(baseAngle + angle/2.0f), sinf(baseAngle + angle/2.0f)});
                                 }
-                            } else if (effectType == BehaviourEffectType::TRIPLE_SHOT) {
-                                auto* tripleShot = dynamic_cast<TripleShotEffect*>(effect.get());
-                                if (tripleShot) {
-                                    float angle = tripleShot->spreadAngle;
-                                    float length = sqrtf(baseDirection.x * baseDirection.x + baseDirection.y * baseDirection.y);
-                                    if (length > 0.0f) {
-                                        Vector2 normalized = {baseDirection.x / length, baseDirection.y / length};
-                                        float baseAngle = atan2f(normalized.y, normalized.x);
-                                        shotDirections.push_back({cosf(baseAngle - angle), sinf(baseAngle - angle)});
-                                        shotDirections.push_back(normalized);
-                                        shotDirections.push_back({cosf(baseAngle + angle), sinf(baseAngle + angle)});
-                                    }
-                                }
-                            } else if (effectType == BehaviourEffectType::PIERCING_SHOT) {
-                                hasPiercing = true;
                             }
+                        } else if (effectType == BehaviourEffectType::TRIPLE_SHOT) {
+                            auto* tripleShot = dynamic_cast<TripleShotEffect*>(effect.get());
+                            if (tripleShot) {
+                                float angle = tripleShot->spreadAngle;
+                                float length = sqrtf(baseDirection.x * baseDirection.x + baseDirection.y * baseDirection.y);
+                                if (length > 0.0f) {
+                                    Vector2 normalized = {baseDirection.x / length, baseDirection.y / length};
+                                    float baseAngle = atan2f(normalized.y, normalized.x);
+                                    shotDirections.push_back({cosf(baseAngle - angle), sinf(baseAngle - angle)});
+                                    shotDirections.push_back(normalized);
+                                    shotDirections.push_back({cosf(baseAngle + angle), sinf(baseAngle + angle)});
+                                }
+                            }
+                        } else if (effectType == BehaviourEffectType::PIERCING_SHOT) {
+                            hasPiercing = true;
                         }
                     }
                 }
