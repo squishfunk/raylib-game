@@ -4,7 +4,7 @@
 static constexpr float PLAYER_RADIUS = 20.0f;
 static constexpr int PLAYER_MAX_HP = 100;
 static constexpr float PLAYER_FIRE_RATE = 1000.0f;
-static constexpr float PLAYER_BULLET_SPEED = BULLET_SPEED;
+static constexpr float PLAYER_BULLET_SPEED = 1500.0f;
 static constexpr float PLAYER_SHOOT_COOLDOWN = SHOOT_COOLDOWN;
 
 int PlayerFactory::create(ECS& ecs, const Vector2 position) {

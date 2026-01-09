@@ -3,6 +3,7 @@
 #include "../components/Components.hpp"
 #include "../events/EventBus.hpp"
 #include "../events/Events.hpp"
+#include "DebugSystem.hpp"
 #include <raylib.h>
 #include <cstdio>
 
@@ -32,44 +33,80 @@ void DamageSystem::handleDamage(ECS& ecs, const CircleCollisionEvent& event) {
         
         int playerId = (tag1 & EntityTag::PLAYER) == EntityTag::PLAYER ? id1 : id2;
         
-        if (ecs.getHealths().isActive(playerId)) {
-            auto& playerHealth = ecs.getHealths().get(playerId);
-            
-            bool canDamage = true;
-            if (currentTime - playerHealth.lastDamageTime < DAMAGE_COOLDOWN) {
-                canDamage = false;
-            }
-            
-            if (canDamage) {
-                playerHealth.healthPoints -= ENEMY_DAMAGE;
-                playerHealth.lastDamageTime = currentTime;
-                printf("Player Health: %d \n", playerHealth.healthPoints);
-            }
-        }
+        DamageSystem::handleEnemyHitPlayer(ecs, playerId);
     }
     
+
     if (((tag1 & EntityTag::BULLET) == EntityTag::BULLET && 
          (tag2 & EntityTag::ENEMY) == EntityTag::ENEMY) ||
         ((tag1 & EntityTag::ENEMY) == EntityTag::ENEMY && 
-         (tag2 & EntityTag::BULLET) == EntityTag::BULLET)) {
-        
+         (tag2 & EntityTag::BULLET) == EntityTag::BULLET)) 
+    {
         int bulletId = (tag1 & EntityTag::BULLET) == EntityTag::BULLET ? id1 : id2;
         int enemyId = (tag1 & EntityTag::ENEMY) == EntityTag::ENEMY ? id1 : id2;
+        DamageSystem::handlePlayerBulletHitEnemy(ecs, bulletId, enemyId);
+    }
+
+    if (((tag1 & EntityTag::ENEMY_BULLET) == EntityTag::ENEMY_BULLET && 
+        (tag2 & EntityTag::PLAYER) == EntityTag::PLAYER) ||
+        ((tag1 & EntityTag::PLAYER) == EntityTag::PLAYER && 
+        (tag2 & EntityTag::ENEMY_BULLET) == EntityTag::ENEMY_BULLET)) 
+    {
+        int bulletId = (tag1 & EntityTag::ENEMY_BULLET) == EntityTag::ENEMY_BULLET ? id1 : id2;
+        int playerId = (tag1 & EntityTag::PLAYER) == EntityTag::PLAYER ? id1 : id2;
+        DamageSystem::handleEnemyBulletHitPlayer(ecs, bulletId, playerId);
+    }
+}
+
+
+void DamageSystem::handleEnemyHitPlayer(ECS &ecs, int playerId){
+    float currentTime = GetTime();
+
+    if (ecs.getHealths().isActive(playerId)) {
+        auto& playerHealth = ecs.getHealths().get(playerId);
         
-        if (ecs.getHealths().isActive(enemyId)) {
-            auto& enemyHealth = ecs.getHealths().get(enemyId);
-            
-            enemyHealth.healthPoints -= BULLET_DAMAGE;
-            enemyHealth.lastDamageTime = currentTime;
-            
-            ecs.getEntities()[bulletId].active = false;
-            
-            if (ecs.getAudios().isActive(enemyId)) {
-                ecs.getAudio(enemyId)->play("HIT_SOUND");
-            }
-            
-            printf("Enemy id: %d Hit. Current health: %d \n", enemyId, enemyHealth.healthPoints);
+        bool canDamage = true;
+        if (currentTime - playerHealth.lastDamageTime < DAMAGE_COOLDOWN) {
+            canDamage = false;
+        }
+        
+        if (canDamage) {
+            playerHealth.healthPoints -= ENEMY_DAMAGE;
+            playerHealth.lastDamageTime = currentTime;
         }
     }
 }
 
+void DamageSystem::handlePlayerBulletHitEnemy(ECS &ecs, int bulletId, int enemyId){
+    float currentTime = GetTime();
+    
+    if (ecs.getHealths().isActive(enemyId)) {
+        auto& enemyHealth = ecs.getHealths().get(enemyId);
+        
+        enemyHealth.healthPoints -= BULLET_DAMAGE;
+        enemyHealth.lastDamageTime = currentTime;
+        
+        ecs.getEntities()[bulletId].active = false;
+        
+        if (ecs.getAudios().isActive(enemyId)) {
+            ecs.getAudio(enemyId)->play("HIT_SOUND");
+        }
+    }
+}
+
+void DamageSystem::handleEnemyBulletHitPlayer(ECS &ecs, int bulletId, int playerId){
+    float currentTime = GetTime();
+    
+    if (ecs.getHealths().isActive(playerId)) {
+        auto& enemyHealth = ecs.getHealths().get(playerId);
+        
+        enemyHealth.healthPoints -= BULLET_DAMAGE;
+        enemyHealth.lastDamageTime = currentTime;
+        
+        ecs.getEntities()[bulletId].active = false;
+        
+        if (ecs.getAudios().isActive(playerId)) {
+            ecs.getAudio(playerId)->play("HIT_SOUND");
+        }
+    }
+}

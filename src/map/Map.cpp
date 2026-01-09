@@ -209,11 +209,19 @@ std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectan
                     
                     int typeRoll = GetRandomValue(0, 100);
                     EnemyType type;
-                    if (typeRoll < 50) {
+                    if (typeRoll < 40) {
                         type = EnemyType::NORMAL;
-                    } else if (typeRoll < 80) {
+                    }
+                    else if (typeRoll < 60) {
+                        type = EnemyType::RANGED_NORMAL;
+                    }
+                    else if (typeRoll < 80) {
+                        type = EnemyType::RANGED_TANK;
+                    }
+                    else if (typeRoll < 95) {
                         type = EnemyType::FAST;
-                    } else {
+                    }
+                    else {
                         type = EnemyType::TANK;
                     }
                     

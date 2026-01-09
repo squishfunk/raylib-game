@@ -4,5 +4,5 @@
 
 class BulletFactory {
 public:
-    static int create(ECS& ecs, Vector2 position, Vector2 velocity, float speed);
+    static int create(ECS& ecs, Vector2 position, Vector2 velocity, float speed, bool isPlayerBullet);
 };

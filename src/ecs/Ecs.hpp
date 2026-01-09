@@ -25,11 +25,11 @@ public:
         active_flags.fill(false);
     }
 
-    std::array<T, MAX_ENTITIES> getData(){
+    std::array<T, MAX_ENTITIES>& getData(){
         return data;
     }
     
-    std::array<bool, MAX_ENTITIES> getActiveFlags(){
+    const std::array<bool, MAX_ENTITIES>& getActiveFlags(){
         return active_flags;
     }
 

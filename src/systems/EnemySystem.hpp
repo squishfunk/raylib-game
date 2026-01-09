@@ -8,7 +8,8 @@ class ECS;
 class EnemySystem {
 public:
     static void update(ECS& ecs);
+    static void handleShooting(ECS& ecs, int enemyId, int playerId);
 };
 
-#endif // ENEMY_SYSTEM_HPP
+#endif
 

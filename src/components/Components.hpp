@@ -42,7 +42,9 @@ enum class EnemyType {
     NORMAL,
     FAST,
     TANK,
-    BOSS
+    BOSS,
+    RANGED_NORMAL,
+    RANGED_TANK,
 };
 
 struct EnemyComponent {
@@ -52,13 +54,15 @@ struct EnemyComponent {
     float lastAttackTime;
     float lastSoundTime;
     float nextSoundTime;
+    bool ranged;
 };
 
 enum class EntityTag : uint8_t {
     NONE = 0,
-    BULLET = 1 << 0,
-    PLAYER = 1 << 1,
-    ENEMY = 1 << 2,
+    PLAYER = 1 << 0,
+    ENEMY = 1 << 1,
+    BULLET = 1 << 2,
+    ENEMY_BULLET = 1 << 3,
 };
 
 inline EntityTag operator|(EntityTag a, EntityTag b) {
@@ -132,6 +136,7 @@ struct EnemyConfig {
     float movementSpeed;
     int damage;
     float attackCooldown;
+    bool ranged;
 };
 
 #endif // COMPONENTS_HPP

@@ -14,7 +14,8 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         .maxHealth = 100,
         .movementSpeed = 240.0f,
         .damage = 10,
-        .attackCooldown = 1.0f
+        .attackCooldown = 1.0f,
+        .ranged = false,
     },
     // ENEMY_TYPE_FAST
     {
@@ -24,7 +25,8 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         .maxHealth = 80,
         .movementSpeed = 400.0f,
         .damage = 8,
-        .attackCooldown = 0.8f
+        .attackCooldown = 0.8f,
+        .ranged = false,
     },
     // ENEMY_TYPE_TANK
     {
@@ -34,7 +36,8 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         .maxHealth = 250,
         .movementSpeed = 100.0f,
         .damage = 15,
-        .attackCooldown = 1.5f
+        .attackCooldown = 1.5f,
+        .ranged = false,
     },
     // ENEMY_TYPE_BOSS
     {
@@ -44,8 +47,31 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         .maxHealth = 1000,
         .movementSpeed = 240.0f,
         .damage = 80,
-        .attackCooldown = 0.5f
-    }
+        .attackCooldown = 0.5f,
+        .ranged = false,
+    },
+    // RANGED_NORMAL
+    {
+        .radius = 20.0f,
+        .color = GREEN,
+        .health = 100,
+        .maxHealth = 100,
+        .movementSpeed = 230.0f,
+        .damage = 40,
+        .attackCooldown = 1.0f,
+        .ranged = true,
+    },
+    // RANGED_TANK
+    {
+        .radius = 30.0f,
+        .color = BLUE,
+        .health = 200,
+        .maxHealth = 200,
+        .movementSpeed = 230.0f,
+        .damage = 30,
+        .attackCooldown = 1.5f,
+        .ranged = true,
+    },
 };
 
 int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
@@ -53,7 +79,7 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
     if (enemyId < 0) return -1;
     
     int typeIndex = static_cast<int>(data.type);
-    assert(typeIndex >= 0 && typeIndex < 4 && "Player transform not found!");
+    assert(typeIndex >= 0 && typeIndex < 6 && "Player transform not found!");
 
     const EnemyConfig* config = &ENEMY_CONFIGS[typeIndex];
     
@@ -61,7 +87,6 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
     float screenWidth = data.bounds.width;
     float screenHeight = data.bounds.height;
     
-    // Fix position depending on radius
     position.x = (position.x + config->radius > screenWidth) ? screenWidth - config->radius : position.x;
     position.x = (position.x - config->radius < 0) ? config->radius : position.x;
     position.y = (position.y + config->radius > screenHeight) ? screenHeight - config->radius : position.y;
@@ -72,6 +97,14 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
     ecs.addRenderable(enemyId, config->radius, config->color);
     ecs.addCircleCollider(enemyId, config->radius, false);
     ecs.addHealth(enemyId, config->health, config->maxHealth);
+
+    if(config->ranged){
+        float shootingRange = 10; /*  TODO */
+        float shootingSpeed = 800.0f; /*  TODO */
+        float shootCooldown = config->attackCooldown; /*  TODO */
+
+        ecs.addShootable(enemyId, shootingRange, shootingSpeed, shootCooldown);
+    }
     
     float currentTime = GetTime();
     float randomDelay = 1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f));
@@ -82,7 +115,8 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
         .attackCooldown = config->attackCooldown,
         .lastAttackTime = 0.0f,
         .lastSoundTime = 0.0f,
-        .nextSoundTime = currentTime + randomDelay
+        .nextSoundTime = currentTime + randomDelay,
+        .ranged = config->ranged
     };
     
     ecs.addEnemy(enemyId, enemyComp);

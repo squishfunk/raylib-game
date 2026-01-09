@@ -25,8 +25,9 @@ void EnemySystem::update(ECS& ecs) {
     for (int i = 0; i < entityCount; i++) {
         if (!entities[i].active) continue;
         if ((entities[i].tags & EntityTag::ENEMY) != EntityTag::ENEMY) continue;
+
+        EnemySystem::handleShooting(ecs, i, playerId);
         
-        // Check if enemy is alive
         bool isAlive = false;
         if (healths.isActive(i)) {
             const auto& health = healths.get(i);
@@ -48,7 +49,6 @@ void EnemySystem::update(ECS& ecs) {
             velocities.get(i).velocity = velocity;
         }
         
-        // Handle random sounds
         if (enemies.isActive(i) && audios.isActive(i)) {
             auto& enemy = enemies.get(i);
             
@@ -58,15 +58,34 @@ void EnemySystem::update(ECS& ecs) {
                 enemy.nextSoundTime = currentTime + randomDelay;
             }
             
-            // Play sound if time has come
             if (currentTime >= enemy.nextSoundTime) {
                 audios.get(i).play("IDLE_SOUND");
                 enemy.lastSoundTime = currentTime;
-                // Set next random sound time (1-5 seconds)
                 float randomDelay = 1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f));
                 enemy.nextSoundTime = currentTime + randomDelay;
             }
         }
     }
+}
+
+void EnemySystem::handleShooting(ECS& ecs, int enemyId, int playerId) {
+    float currentTime = GetTime();
+    
+    auto& shootable = ecs.getShootables().get(enemyId);
+    auto& transform = ecs.getTransforms().get(enemyId);
+    
+    if (currentTime - shootable.lastShootTime < shootable.shootCooldown) return;
+    
+    const auto& playerTransform = ecs.getTransforms().get(playerId);
+
+    Vector2 direction = Vector2Subtract(playerTransform.position, transform.position);
+    direction = Vector2Normalize(direction);
+    
+    if (ecs.getAudios().isActive(enemyId)) {
+        ecs.getAudio(enemyId)->play("SHOOT_SOUND");
+    }
+    
+    shootable.direction = direction;
+    shootable.shoot = true;
 }
 
