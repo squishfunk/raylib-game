@@ -25,6 +25,7 @@ private:
     void despawnCurrentRoom();
     void spawnEnemies(const Room& room);
     void spawnDoors(const Room& room);
+    void spawnItems(const Room& room);
     void onDoorCollision(const DoorCollisionEvent& event);
     
     DoorFlags getOppositeDoor(DoorFlags door) const;

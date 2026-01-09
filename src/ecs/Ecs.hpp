@@ -83,6 +83,9 @@ private:
     ComponentStorage<ShootableComponent> shootables;
     ComponentStorage<AudioComponent> audios;
     ComponentStorage<CircleColliderComponent> circleColliders;
+    ComponentStorage<StatsManagerComponent> statsManagers;
+    ComponentStorage<BehaviourModifierComponent> behaviourModifiers;
+    ComponentStorage<ItemComponent> items;
     
 public:
     ECS() : entityCount(0) {
@@ -128,6 +131,18 @@ public:
     CircleColliderComponent* getCircleCollider(int entityId);
     const CircleColliderComponent* getCircleCollider(int entityId) const;
     
+    void addStatsManager(int entityId);
+    StatsManagerComponent* getStatsManager(int entityId);
+    const StatsManagerComponent* getStatsManager(int entityId) const;
+    
+    void addBehaviourModifier(int entityId);
+    BehaviourModifierComponent* getBehaviourModifier(int entityId);
+    const BehaviourModifierComponent* getBehaviourModifier(int entityId) const;
+    
+    void addItem(int entityId, const ItemComponent& itemComponent);
+    ItemComponent* getItem(int entityId);
+    const ItemComponent* getItem(int entityId) const;
+    
     const std::array<Entity, MAX_ENTITIES>& getEntities() const { return entities; }
     std::array<Entity, MAX_ENTITIES>& getEntities() { return entities; }
     int getEntityCount() const { return entityCount; }
@@ -158,6 +173,15 @@ public:
     
     ComponentStorage<CircleColliderComponent>& getCircleColliders() { return circleColliders; }
     const ComponentStorage<CircleColliderComponent>& getCircleColliders() const { return circleColliders; }
+    
+    ComponentStorage<StatsManagerComponent>& getStatsManagers() { return statsManagers; }
+    const ComponentStorage<StatsManagerComponent>& getStatsManagers() const { return statsManagers; }
+    
+    ComponentStorage<BehaviourModifierComponent>& getBehaviourModifiers() { return behaviourModifiers; }
+    const ComponentStorage<BehaviourModifierComponent>& getBehaviourModifiers() const { return behaviourModifiers; }
+    
+    ComponentStorage<ItemComponent>& getItems() { return items; }
+    const ComponentStorage<ItemComponent>& getItems() const { return items; }
 };
 
 #endif // ECS_HPP

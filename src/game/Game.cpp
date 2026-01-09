@@ -12,6 +12,8 @@
 #include "../systems/RoomSystem.hpp"
 #include "../systems/DebugSystem.hpp"
 #include "../systems/ShootingSystem.hpp"
+#include "../systems/PickupSystem.hpp"
+#include "../systems/ItemSystem.hpp"
 #include "../factories/PlayerFactory.hpp"
 #include "../map/Map.hpp"
 #include "../map/Dungeon.hpp"
@@ -144,6 +146,7 @@ void Game::initGame(){
     dungeonManager->loadRoom(startRoom, DoorFlags::NONE);
 
     DamageSystem::init(ecs, eventBus);
+    ItemSystem::init(ecs, eventBus);
 
     currentState = GameState::PLAYING;
 }
@@ -162,6 +165,7 @@ void Game::updatePlaying() {
     EnemySystem::update(ecs);
     MovementSystem::update(ecs);
     CollisionDetectionSystem::update(ecs, eventBus);
+    PickupSystem::update(ecs, eventBus);
     HealthSystem::update(ecs);
     RoomSystem::update(ecs, map);
     DoorSystem::update(ecs, eventBus);
@@ -181,6 +185,7 @@ void Game::renderPlaying() const {
     ClearBackground(RAYWHITE);
 
     RenderSystem::render(ecs, map);
+    RenderSystem::renderUI(screenWidth, screenHeight);
 
     if(DEBUG_MODE){
         DebugSystem::render(ecs, map, playerId, screenWidth, screenHeight);

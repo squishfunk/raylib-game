@@ -15,6 +15,9 @@ int ECS::createEntity() {
             shootables.setActive(i, false);
             audios.setActive(i, false);
             circleColliders.setActive(i, false);
+            statsManagers.setActive(i, false);
+            behaviourModifiers.setActive(i, false);
+            items.setActive(i, false);
             return i;
         }
     }
@@ -36,6 +39,9 @@ int ECS::createEntity() {
     shootables.setActive(entityId, false);
     audios.setActive(entityId, false);
     circleColliders.setActive(entityId, false);
+    statsManagers.setActive(entityId, false);
+    behaviourModifiers.setActive(entityId, false);
+    items.setActive(entityId, false);
     
     return entityId;
 }
@@ -54,6 +60,9 @@ void ECS::destroyEntity(int entityId) {
     shootables.setActive(entityId, false);
     audios.setActive(entityId, false);
     circleColliders.setActive(entityId, false);
+    statsManagers.setActive(entityId, false);
+    behaviourModifiers.setActive(entityId, false);
+    items.setActive(entityId, false);
 }
 
 void ECS::addTransform(int entityId, Vector2 position) {
@@ -185,5 +194,42 @@ CircleColliderComponent* ECS::getCircleCollider(int entityId) {
 
 const CircleColliderComponent* ECS::getCircleCollider(int entityId) const {
     return circleColliders.getPtr(entityId);
+}
+
+void ECS::addStatsManager(int entityId) {
+    statsManagers.setActive(entityId, true);
+}
+
+StatsManagerComponent* ECS::getStatsManager(int entityId) {
+    return statsManagers.getPtr(entityId);
+}
+
+const StatsManagerComponent* ECS::getStatsManager(int entityId) const {
+    return statsManagers.getPtr(entityId);
+}
+
+void ECS::addBehaviourModifier(int entityId) {
+    behaviourModifiers.setActive(entityId, true);
+}
+
+BehaviourModifierComponent* ECS::getBehaviourModifier(int entityId) {
+    return behaviourModifiers.getPtr(entityId);
+}
+
+const BehaviourModifierComponent* ECS::getBehaviourModifier(int entityId) const {
+    return behaviourModifiers.getPtr(entityId);
+}
+
+void ECS::addItem(int entityId, const ItemComponent& itemComponent) {
+    items.get(entityId) = itemComponent;
+    items.setActive(entityId, true);
+}
+
+ItemComponent* ECS::getItem(int entityId) {
+    return items.getPtr(entityId);
+}
+
+const ItemComponent* ECS::getItem(int entityId) const {
+    return items.getPtr(entityId);
 }
 

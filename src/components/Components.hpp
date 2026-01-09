@@ -5,6 +5,9 @@
 #include <cstdint>
 #include <unordered_map>
 #include <string>
+#include <vector>
+#include <memory>
+#include "BehaviourEffects.hpp"
 
 enum class DoorFlags : uint8_t;
 
@@ -17,6 +20,18 @@ constexpr float BULLET_RADIUS = 5.0f;
 constexpr float DAMAGE_COOLDOWN = 1.0f;
 constexpr int ENEMY_DAMAGE = 10;
 constexpr int BULLET_DAMAGE = 40;
+
+enum class StatType {
+    HEALTH,
+    SPEED,
+    DAMAGE,
+    FIRE_RATE
+};
+
+enum class EffectType {
+    ADDITIVE,
+    MULTIPLICATIVE
+};
 
 struct TransformComponent {
     Vector2 position;
@@ -63,6 +78,8 @@ enum class EntityTag : uint8_t {
     ENEMY = 1 << 1,
     BULLET = 1 << 2,
     ENEMY_BULLET = 1 << 3,
+    ITEM = 1 << 4,
+    PIERCING_BULLET = 1 << 5,
 };
 
 inline EntityTag operator|(EntityTag a, EntityTag b) {
@@ -128,6 +145,61 @@ struct CircleColliderComponent {
     bool isTrigger = false;
 };
 
+struct StatEffect {
+    StatType type;
+    EffectType effectType;
+    float value;
+};
+
+struct StatsManagerComponent {
+    std::vector<StatEffect> effects;
+    
+    void addEffect(const StatEffect& effect) {
+        effects.push_back(effect);
+    }
+    
+    float getFinalValue(StatType statType, float baseValue) const {
+        float additiveSum = 0.0f;
+        float multiplicativeProduct = 1.0f;
+        
+        for (const auto& effect : effects) {
+            if (effect.type == statType) {
+                if (effect.effectType == EffectType::ADDITIVE) {
+                    additiveSum += effect.value;
+                } else if (effect.effectType == EffectType::MULTIPLICATIVE) {
+                    multiplicativeProduct *= effect.value;
+                }
+            }
+        }
+        
+        return (baseValue + additiveSum) * multiplicativeProduct;
+    }
+};
+
+struct BehaviourModifierComponent {
+    std::vector<std::shared_ptr<BehaviourEffectBase>> effects;
+    
+    void addEffect(std::shared_ptr<BehaviourEffectBase> effect) {
+        effects.push_back(effect);
+    }
+    
+    bool hasEffect(BehaviourEffectType type) const {
+        for (const auto& effect : effects) {
+            if (effect && effect->getType() == type) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+struct ItemComponent {
+    std::string name;
+    std::vector<StatEffect> statEffects;
+    std::vector<std::shared_ptr<BehaviourEffectBase>> behaviourEffects;
+    bool isPickedUp = false;
+};
+
 struct EnemyConfig {
     float radius;
     Color color;
@@ -139,5 +211,5 @@ struct EnemyConfig {
     bool ranged;
 };
 
-#endif // COMPONENTS_HPP
+#endif
 

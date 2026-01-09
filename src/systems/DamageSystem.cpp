@@ -86,7 +86,10 @@ void DamageSystem::handlePlayerBulletHitEnemy(ECS &ecs, int bulletId, int enemyI
         enemyHealth.healthPoints -= BULLET_DAMAGE;
         enemyHealth.lastDamageTime = currentTime;
         
-        ecs.getEntities()[bulletId].active = false;
+        const auto& entities = ecs.getEntities();
+        if ((entities[bulletId].tags & EntityTag::PIERCING_BULLET) != EntityTag::PIERCING_BULLET) {
+            ecs.getEntities()[bulletId].active = false;
+        }
         
         if (ecs.getAudios().isActive(enemyId)) {
             ecs.getAudio(enemyId)->play("HIT_SOUND");

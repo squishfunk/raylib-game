@@ -1,6 +1,8 @@
 #ifndef RENDER_SYSTEM_HPP
 #define RENDER_SYSTEM_HPP
 
+#include <string>
+
 class ECS;
 class Map;
 
@@ -12,7 +14,8 @@ private:
     
 public:
     static void render(const ECS& ecs, const Map &map);
-    static void renderUI(const ECS& ecs, const Map& map);
+    static void renderUI(int screenWidth, int screenHeight);
+    static void setPickedUpItemName(const std::string& name);
 };
 
 #endif // RENDER_SYSTEM_HPP

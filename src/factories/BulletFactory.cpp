@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <raylib.h>
 
-int BulletFactory::create(ECS& ecs, Vector2 position, Vector2 velocity, float speed, bool isPlayerShooting){
+int BulletFactory::create(ECS& ecs, Vector2 position, Vector2 velocity, float speed, bool isPlayerShooting, bool isPiercing){
     int bulletId = ecs.createEntity();
     if (bulletId >= 0) {
         EntityTag bulletTag;
@@ -14,6 +14,10 @@ int BulletFactory::create(ECS& ecs, Vector2 position, Vector2 velocity, float sp
         }else{
             bulletTag = EntityTag::ENEMY_BULLET;
             color = RED;
+        }
+        
+        if (isPiercing) {
+            bulletTag = bulletTag | EntityTag::PIERCING_BULLET;
         }
 
         ecs.addTransform(bulletId, position);

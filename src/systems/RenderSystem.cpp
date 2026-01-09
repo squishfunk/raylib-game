@@ -3,7 +3,13 @@
 #include "../components/Components.hpp"
 #include "../map/Map.hpp"
 #include <cstdio>
+#include <string>
 #include <raylib.h>
+
+namespace {
+    std::string lastPickedUpItemName = "";
+    float lastPickedUpItemTime = -1.0f;
+}
 
 void RenderSystem::renderMinimap(const Map& map, int screenX, int screenY) {
     int cellSize = 15;
@@ -118,5 +124,31 @@ void RenderSystem::renderECS(const ECS& ecs){
 void RenderSystem::render(const ECS& ecs, const Map &map) {
     renderECS(ecs);
     renderMinimap(map, 10, 10);
+}
+
+void RenderSystem::renderUI(int screenWidth, int screenHeight) {
+    float currentTime = GetTime();
+    if (!lastPickedUpItemName.empty() && lastPickedUpItemTime >= 0.0f && currentTime - lastPickedUpItemTime < 2.0f) {
+        float elapsed = currentTime - lastPickedUpItemTime;
+        float alpha = 1.0f - (elapsed / 2.0f); // Fade out
+        
+        const char* text = lastPickedUpItemName.c_str();
+        int fontSize = 30;
+        int textWidth = MeasureText(text, fontSize);
+        int x = screenWidth / 2 - textWidth / 2;
+        int y = 100;
+        
+        // background
+        Color bgColor = {0, 0, 0, static_cast<unsigned char>(150 * alpha)};
+        DrawRectangle(x - 10, y - 5, textWidth + 20, fontSize + 10, bgColor);
+        
+        Color textColor = {255, 255, 255, static_cast<unsigned char>(255 * alpha)};
+        DrawText(text, x, y, fontSize, textColor);
+    }
+}
+
+void RenderSystem::setPickedUpItemName(const std::string& name) {
+    lastPickedUpItemName = name;
+    lastPickedUpItemTime = GetTime();
 }
 

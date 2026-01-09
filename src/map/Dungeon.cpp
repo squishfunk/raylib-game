@@ -2,6 +2,7 @@
 #include "Map.hpp"
 #include "../factories/DoorFactory.hpp"
 #include "../factories/EnemyFactory.hpp"
+#include "../factories/ItemFactory.hpp"
 #include <cassert>
 #include <cstdio>
 #include <raylib.h>
@@ -59,6 +60,10 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
         spawnEnemies(room);
     }
     spawnDoors(room);
+    
+    if (room.type == RoomType::TREASURE) {
+        spawnItems(room);
+    }
 }
 
 void Dungeon::despawnCurrentRoom() {
@@ -102,6 +107,21 @@ void Dungeon::spawnDoors(const Room& room) {
             if (door != -1) {
                 currentRoomEntities.push_back(door);
             }
+        }
+    }
+}
+
+void Dungeon::spawnItems(const Room& room) {
+    int itemCount = GetRandomValue(1, 3);
+    
+    for (int i = 0; i < itemCount; i++) {
+        float margin = 100.0f;
+        float x = margin + static_cast<float>(GetRandomValue(0, static_cast<int>(room.bounds.width - 2 * margin)));
+        float y = margin + static_cast<float>(GetRandomValue(0, static_cast<int>(room.bounds.height - 2 * margin)));
+        
+        int itemId = ItemFactory::createRandomItem(ecs, Vector2{x, y});
+        if (itemId >= 0) {
+            currentRoomEntities.push_back(itemId);
         }
     }
 }

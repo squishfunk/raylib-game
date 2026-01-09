@@ -19,5 +19,14 @@ struct CircleCollisionEvent {
         : entityId1(id1), entityId2(id2) {}
 };
 
-#endif // EVENTS_HPP
+struct ItemPickupEvent {
+    int playerEntityId;
+    int itemEntityId;
+    std::string itemName;
+    
+    ItemPickupEvent(int playerId, int itemId, const std::string& name = "") 
+        : playerEntityId(playerId), itemEntityId(itemId), itemName(name) {}
+};
+
+#endif 
 
