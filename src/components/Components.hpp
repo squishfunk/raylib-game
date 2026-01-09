@@ -182,6 +182,16 @@ struct BehaviourModifierComponent {
     void addEffect(std::shared_ptr<BehaviourEffectBase> effect) {
         effects.push_back(effect);
     }
+
+    template<typename T>
+    const T* get() const {
+        for (const auto& effect : effects) {
+            if (auto* casted = dynamic_cast<const T*>(effect.get())) {
+                return casted;
+            }
+        }
+        return nullptr;
+    }
     
     bool hasEffect(BehaviourEffectType type) const {
         for (const auto& effect : effects) {

@@ -54,7 +54,6 @@ void PlayerSystem::handleShooting(ECS& ecs, int playerId) {
     
     if (currentTime - shootable.lastShootTime < shootable.shootCooldown) return;
     
-    const auto& playerTransform = ecs.getTransforms().get(playerId);
     Vector2 direction = {0, 0};
     
     if (IsKeyDown(KEY_UP)) direction.y = -1.0f;

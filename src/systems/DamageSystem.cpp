@@ -24,8 +24,6 @@ void DamageSystem::handleDamage(ECS& ecs, const CircleCollisionEvent& event) {
     EntityTag tag1 = entities[id1].tags;
     EntityTag tag2 = entities[id2].tags;
     
-    float currentTime = GetTime();
-    
     if (((tag1 & EntityTag::PLAYER) == EntityTag::PLAYER && 
          (tag2 & EntityTag::ENEMY) == EntityTag::ENEMY) ||
         ((tag1 & EntityTag::ENEMY) == EntityTag::ENEMY && 

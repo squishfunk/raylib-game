@@ -3,6 +3,7 @@
 #include "../map/Map.hpp"
 #include "../map/Dungeon.hpp"
 #include "../components/Components.hpp"
+#include "../components/BehaviourEffects.hpp"
 #include "../utils/Helpers.hpp"
 #include <raylib.h>
 #include <cstdio>
@@ -85,6 +86,34 @@ void DebugSystem::teleportToBoss(Map& map, Dungeon* dungeon) {
 }
 
 
+static const char* statTypeToString(StatType type) {
+    switch(type) {
+        case StatType::HEALTH: return "HEALTH";
+        case StatType::SPEED: return "SPEED";
+        case StatType::DAMAGE: return "DAMAGE";
+        case StatType::FIRE_RATE: return "FIRE_RATE";
+        default: return "UNKNOWN";
+    }
+}
+
+static const char* effectTypeToString(EffectType type) {
+    switch(type) {
+        case EffectType::ADDITIVE: return "+";
+        case EffectType::MULTIPLICATIVE: return "x";
+        default: return "?";
+    }
+}
+
+static const char* behaviourEffectTypeToString(BehaviourEffectType type) {
+    switch(type) {
+        case BehaviourEffectType::DOUBLE_SHOT: return "DOUBLE_SHOT";
+        case BehaviourEffectType::TRIPLE_SHOT: return "TRIPLE_SHOT";
+        case BehaviourEffectType::DRUNK_MOVEMENT: return "DRUNK_MOVEMENT";
+        case BehaviourEffectType::PIERCING_SHOT: return "PIERCING_SHOT";
+        default: return "UNKNOWN";
+    }
+}
+
 void DebugSystem::render(const ECS& ecs, const Map& map, int playerId, int screenWidth, int screenHeight) {
     int padding = 10;
     int fontSize = 14;
@@ -122,6 +151,7 @@ void DebugSystem::render(const ECS& ecs, const Map& map, int playerId, int scree
         case RoomType::BOSS: roomTypeStr = "BOSS"; break;
         case RoomType::TREASURE: roomTypeStr = "TREASURE"; break;
         case RoomType::EMPTY: roomTypeStr = "EMPTY"; break;
+        case RoomType::SECRET: roomTypeStr = "SECRET"; break;
     }
     char typeText[64];
     snprintf(typeText, sizeof(typeText), "Room Type: %s", roomTypeStr);
@@ -197,5 +227,97 @@ void DebugSystem::render(const ECS& ecs, const Map& map, int playerId, int scree
                  fontSize, 
                  LIGHTGRAY);
         cheatY += lineHeight + 2;
+    }
+    
+    int buffStartX = screenWidth - 300;
+    int buffStartY = 10;
+    int buffWidth = 290;
+    int buffMaxHeight = 400;
+    
+    int buffY = buffStartY;
+    int maxY = buffStartY;
+    bool hasStats = false;
+    bool hasBehaviour = false;
+    
+    if (ecs.getStatsManagers().isActive(playerId)) {
+        const auto& statsManager = ecs.getStatsManagers().get(playerId);
+        if (!statsManager.effects.empty()) {
+            hasStats = true;
+            buffY += 25; 
+            for (const auto& effect : statsManager.effects) {
+                if (buffY + lineHeight > buffStartY + buffMaxHeight) break;
+                buffY += lineHeight;
+            }
+            maxY = buffY;
+        }
+    }
+    
+    if (ecs.getBehaviourModifiers().isActive(playerId)) {
+        const auto& behaviourModifier = ecs.getBehaviourModifiers().get(playerId);
+        if (!behaviourModifier.effects.empty()) {
+            hasBehaviour = true;
+            if (maxY > buffStartY) {
+                buffY = maxY + 10; 
+            } else {
+                buffY = buffStartY;
+            }
+            buffY += 25;
+            for (const auto& effect : behaviourModifier.effects) {
+                if (buffY + lineHeight > buffStartY + buffMaxHeight) break;
+                buffY += lineHeight;
+            }
+            maxY = buffY;
+        }
+    }
+    
+    if (maxY > buffStartY) {
+        int totalHeight = maxY - buffStartY + padding;
+        DrawRectangle(buffStartX, buffStartY, buffWidth, totalHeight, (Color){0, 0, 0, 200});
+        DrawRectangleLines(buffStartX, buffStartY, buffWidth, totalHeight, DARKGRAY);
+    }
+    
+    buffY = buffStartY;
+    if (hasStats && ecs.getStatsManagers().isActive(playerId)) {
+        const auto& statsManager = ecs.getStatsManagers().get(playerId);
+        DrawText("BUFFY (Stats)", buffStartX + padding, buffY + 3, 16, SKYBLUE);
+        buffY += 25;
+        
+        for (const auto& effect : statsManager.effects) {
+            if (buffY + lineHeight > buffStartY + buffMaxHeight) break;
+            
+            char buffText[128];
+            const char* statName = statTypeToString(effect.type);
+            const char* effectSymbol = effectTypeToString(effect.effectType);
+            
+            if (effect.effectType == EffectType::MULTIPLICATIVE) {
+                snprintf(buffText, sizeof(buffText), "%s %s%.2f", 
+                        statName, effectSymbol, effect.value);
+            } else {
+                snprintf(buffText, sizeof(buffText), "%s %s%.0f", 
+                        statName, effectSymbol, effect.value);
+            }
+            
+            DrawText(buffText, buffStartX + padding, buffY, fontSize, LIME);
+            buffY += lineHeight;
+        }
+    }
+    
+    if (hasBehaviour && ecs.getBehaviourModifiers().isActive(playerId)) {
+        const auto& behaviourModifier = ecs.getBehaviourModifiers().get(playerId);
+        if (buffY > buffStartY) {
+            buffY += 10;
+        }
+        
+        DrawText("MODYFIKATORY (Behaviour)", buffStartX + padding, buffY + 3, 16, MAGENTA);
+        buffY += 25;
+        
+        for (const auto& effect : behaviourModifier.effects) {
+            if (buffY + lineHeight > buffStartY + buffMaxHeight) break;
+            if (!effect) continue;
+            
+            const char* effectName = behaviourEffectTypeToString(effect->getType());
+            DrawText(effectName, buffStartX + padding, buffY, fontSize, YELLOW);
+            buffY += lineHeight;
+        }
     }
 }

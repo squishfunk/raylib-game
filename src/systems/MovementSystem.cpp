@@ -23,59 +23,18 @@ void MovementSystem::update(ECS& ecs) {
         auto& transform = transforms.get(i);
         auto& velocity = velocities.get(i);
         
-        // Oblicz finalną prędkość używając StatsManagerComponent
         float finalSpeed = velocity.speed;
         if (statsManagers.isActive(i)) {
-            const auto* statsManager = ecs.getStatsManager(i);
-            if (statsManager) {
-                finalSpeed = statsManager->getFinalValue(StatType::SPEED, velocity.speed);
-            }
+            finalSpeed = ecs.getStatsManager(i)->getFinalValue(StatType::SPEED, velocity.speed);
         }
         
-        // Aplikuj DrunkMovementEffect jeśli istnieje
         Vector2 movementDirection = velocity.velocity;
-        bool hasDrunkMovement = false;
-        float randomDeviation = 0.0f;
-        float slowdownChance = 0.0f;
         
         if (behaviourModifiers.isActive(i)) {
-            const auto* behaviourModifier = ecs.getBehaviourModifier(i);
-            if (behaviourModifier) {
-                for (const auto& effect : behaviourModifier->effects) {
-                    if (effect && effect->getType() == BehaviourEffectType::DRUNK_MOVEMENT) {
-                        hasDrunkMovement = true;
-                        auto* drunkEffect = dynamic_cast<DrunkMovementEffect*>(effect.get());
-                        if (drunkEffect) {
-                            randomDeviation = drunkEffect->randomDeviation;
-                            slowdownChance = drunkEffect->slowdownChance;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // Aplikuj losowe odchylenia dla DrunkMovementEffect
-        if (hasDrunkMovement && (movementDirection.x != 0.0f || movementDirection.y != 0.0f)) {
-            // Normalizuj kierunek
-            float length = sqrtf(movementDirection.x * movementDirection.x + movementDirection.y * movementDirection.y);
-            if (length > 0.0f) {
-                movementDirection.x /= length;
-                movementDirection.y /= length;
-            }
-            
-            // Dodaj losowe odchylenie
-            float randomAngle = ((float)rand() / RAND_MAX) * 2.0f * randomDeviation - randomDeviation;
-            float cosAngle = cosf(randomAngle);
-            float sinAngle = sinf(randomAngle);
-            float newX = movementDirection.x * cosAngle - movementDirection.y * sinAngle;
-            float newY = movementDirection.x * sinAngle + movementDirection.y * cosAngle;
-            movementDirection.x = newX;
-            movementDirection.y = newY;
-            
-            // Sprawdź szansę spowolnienia
-            if (((float)rand() / RAND_MAX) < slowdownChance) {
-                finalSpeed *= 0.5f;  // Spowolnij o 50%
+            const auto* drunkEffect = ecs.getBehaviourModifier(i)->get<DrunkMovementEffect>();
+
+            if (drunkEffect) {
+                applyDrunkEffect(drunkEffect, &movementDirection, &finalSpeed);
             }
         }
         
@@ -84,3 +43,24 @@ void MovementSystem::update(ECS& ecs) {
     }
 }
 
+
+void MovementSystem::applyDrunkEffect(const DrunkMovementEffect* drunkEffect, Vector2* movementDirection, float* finalSpeed){
+
+    float length = sqrtf(movementDirection->x * movementDirection->x + movementDirection->y * movementDirection->y);
+    if (length > 0.05f) {
+        movementDirection->x /= length;
+        movementDirection->y /= length;
+    }
+    
+    float randomAngle = (GetRandomValue(0, 10000) / 10000.0f) * 2.0f * drunkEffect->randomDeviation - drunkEffect->randomDeviation;
+    float cosAngle = cosf(randomAngle);
+    float sinAngle = sinf(randomAngle);
+    float newX = movementDirection->x * cosAngle - movementDirection->y * sinAngle;
+    float newY = movementDirection->x * sinAngle + movementDirection->y * cosAngle;
+    movementDirection->x = newX;
+    movementDirection->y = newY;
+    
+    if (GetRandomValue(1, 100) <= drunkEffect->slowdownChance * 100) {
+        *finalSpeed *= 0.5f;
+    }
+}
