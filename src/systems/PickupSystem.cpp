@@ -34,7 +34,6 @@ void PickupSystem::update(ECS& ecs, EventBus& eventBus) {
         const auto& itemTransform = transforms.get(i);
         const auto& itemCollider = colliders.get(i);
         
-        // Sprawdź kolizję
         if (Helpers::checkCircleCollision(
             playerTransform.position, playerCollider.radius,
             itemTransform.position, itemCollider.radius)) {

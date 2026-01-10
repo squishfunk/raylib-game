@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include <cstdint>
+#include <set>
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -200,6 +201,16 @@ struct BehaviourModifierComponent {
             }
         }
         return false;
+    }
+    
+    std::set<BehaviourEffectType> getAllEffectTypes() const {
+        std::set<BehaviourEffectType> types;
+        for (const auto& effect : effects) {
+            if (effect) {
+                types.insert(effect->getType());
+            }
+        }
+        return types;
     }
 };
 

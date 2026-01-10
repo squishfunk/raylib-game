@@ -1,4 +1,5 @@
 #include "ItemFactory.hpp"
+#include "utils/Helpers.hpp"
 #include <raylib.h>
 #include <cstdlib>
 
@@ -15,27 +16,61 @@ int ItemFactory::createItemBase(ECS& ecs, Vector2 position, const ItemComponent&
 }
 
 int ItemFactory::createRandomItem(ECS& ecs, Vector2 position) {
-    int itemType = GetRandomValue(0, 7);
-    
-    switch (itemType) {
-        case 0:
-            return createSpeedBoostItem(ecs, position, GetRandomValue(50, 150));
-        case 1:
-            return createHealthBoostItem(ecs, position, GetRandomValue(20, 50));
-        case 2:
-            return createDamageBoostItem(ecs, position, 1.2f + (GetRandomValue(0, 30) / 100.0f));
-        case 3:
-            return createFireRateBoostItem(ecs, position, 1.2f + (GetRandomValue(0, 30) / 100.0f));
-        case 4:
-            return createDoubleShotItem(ecs, position, 0.2f + (GetRandomValue(0, 20) / 100.0f));
-        case 5:
-            return createTripleShotItem(ecs, position, 0.3f + (GetRandomValue(0, 20) / 100.0f));
-        case 6:
-            return createDrunkMovementItem(ecs, position, 0.05f + (GetRandomValue(0, 10) / 100.0f), 0.1f + (GetRandomValue(0, 20) / 100.0f));
-        case 7:
-            return createPiercingShotItem(ecs, position);
-        default:
-            return createSpeedBoostItem(ecs, position, 100.0f);
+    int playerId = Helpers::getPlayerId(ecs);    
+    auto* behaviourModifier = ecs.getBehaviourModifier(playerId);
+        
+    int itemType = GetRandomValue(0, 1);
+    if(itemType == 0){
+        // behaviour item
+        auto existingEffects = behaviourModifier ? behaviourModifier->getAllEffectTypes() : std::set<BehaviourEffectType>();
+        
+        std::vector<BehaviourEffectType> allEffects = {
+            BehaviourEffectType::DOUBLE_SHOT,
+            BehaviourEffectType::TRIPLE_SHOT,
+            BehaviourEffectType::DRUNK_MOVEMENT,
+            BehaviourEffectType::PIERCING_SHOT
+        };
+        
+        std::vector<BehaviourEffectType> availableEffects;
+        for (const auto& effect : allEffects) {
+            if (existingEffects.find(effect) == existingEffects.end()) {
+                availableEffects.push_back(effect);
+            }
+        }
+        
+        if (availableEffects.empty()) {
+            availableEffects = allEffects;
+        }
+        
+        int randomIndex = GetRandomValue(0, availableEffects.size() - 1);
+        BehaviourEffectType selectedEffect = availableEffects[randomIndex];
+        
+        switch (selectedEffect) {
+            case BehaviourEffectType::DOUBLE_SHOT:
+                return createDoubleShotItem(ecs, position, 0.3f);
+            case BehaviourEffectType::TRIPLE_SHOT:
+                return createTripleShotItem(ecs, position, 0.4f);
+            case BehaviourEffectType::DRUNK_MOVEMENT:
+                return createDrunkMovementItem(ecs, position, 0.1f, 0.2f);
+            case BehaviourEffectType::PIERCING_SHOT:
+                return createPiercingShotItem(ecs, position);
+            default:
+                return createDoubleShotItem(ecs, position, 0.3f);
+        }
+    }else{
+        int statsItemType = GetRandomValue(0, 1);
+        switch (statsItemType) {
+            case 0:
+                return createSpeedBoostItem(ecs, position, GetRandomValue(50, 150));
+            case 1:
+                return createHealthBoostItem(ecs, position, GetRandomValue(20, 50));
+            case 2:
+                return createDamageBoostItem(ecs, position, 1.2f + (GetRandomValue(0, 30) / 100.0f));
+            case 3:
+                return createFireRateBoostItem(ecs, position, 1.2f + (GetRandomValue(0, 30) / 100.0f));
+            default:
+                return createSpeedBoostItem(ecs, position, 100.0f);
+        }
     }
 }
 

@@ -61,7 +61,7 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
     }
     spawnDoors(room);
     
-    if (room.type == RoomType::TREASURE) {
+    if (room.type == RoomType::TREASURE && !room.visited) {
         spawnItems(room);
     }
 }
@@ -112,12 +112,11 @@ void Dungeon::spawnDoors(const Room& room) {
 }
 
 void Dungeon::spawnItems(const Room& room) {
-    int itemCount = GetRandomValue(1, 3);
+    int itemCount = 1;
     
     for (int i = 0; i < itemCount; i++) {
-        float margin = 100.0f;
-        float x = margin + static_cast<float>(GetRandomValue(0, static_cast<int>(room.bounds.width - 2 * margin)));
-        float y = margin + static_cast<float>(GetRandomValue(0, static_cast<int>(room.bounds.height - 2 * margin)));
+        float x = room.bounds.width / 2;
+        float y = room.bounds.height / 2;
         
         int itemId = ItemFactory::createRandomItem(ecs, Vector2{x, y});
         if (itemId >= 0) {
