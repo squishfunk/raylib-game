@@ -1,9 +1,11 @@
 #include "Map.hpp"
 #include "../components/Components.hpp"
+#include <algorithm>
 #include <cstring>
 #include <cstdlib>
 #include <raylib.h>
 #include <math.h>
+#include <vector>
 
 Map::Map() : startX(0), startY(0), currentX(0), currentY(0), generated(false) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
@@ -43,10 +45,46 @@ void Map::connectRooms(int x1, int y1, int x2, int y2) {
     }
 }
 
+std::vector<RoomCord> Map::GeneratePath(RoomCord start){
+    int pathLength = MIN_MAP_PATH_LENGTH + GetRandomValue(0, 5);
+    int allPosibleDirections[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+    
+    std::vector<RoomCord> path;
+    do{
+        std::vector<RoomCord> visitedPath;
+        path.clear();
+
+        RoomCord current = start;
+        path.push_back(start);
+        visitedPath.push_back(start);
+
+        for (int i = 0; i < pathLength; i++) {
+            int attempts = 0;
+            RoomCord newCord;
+            
+            do {
+                int dir = GetRandomValue(0, 3);
+                newCord = {current.x + allPosibleDirections[dir][0], current.y + allPosibleDirections[dir][1]};
+                attempts++;
+            } while ((newCord.x < 0 || newCord.x >= MAP_WIDTH || 
+                newCord.y < 0 || newCord.y >= MAP_HEIGHT ||
+                std::find(visitedPath.begin(), visitedPath.end(), newCord) != visitedPath.end()) && attempts < 20);
+            
+            if (attempts < 20) {
+                visitedPath.push_back(newCord);
+                path.push_back(newCord);
+                current = newCord;
+            } else {
+                break;
+            }
+        }
+    }
+    while(path.size() < MIN_MAP_PATH_LENGTH);
+
+    return path;
+}
 void Map::generate() {
     init();
-    
-    int pathLength = 8 + GetRandomValue(0, 5);
     
     // 2
     startX = MAP_WIDTH / 2;
@@ -55,81 +93,81 @@ void Map::generate() {
 
     currentX = startX;
     currentY = startY;
-
+    
     Rectangle roomBounds = Rectangle{0, 0, 1000.0f, 650.0f};
-    
-    rooms[currentY][currentX].type = RoomType::START;
-    rooms[currentY][currentX].gridX = currentX;
-    rooms[currentY][currentX].gridY = currentY;
-    rooms[currentY][currentX].visited = true;
-    rooms[currentY][currentX].cleared = false;
-    rooms[currentY][currentX].bounds = roomBounds; 
-    rooms[currentY][currentX].enemySpawns = generateEnemySpawns(RoomType::START, roomBounds);
-    
-    for (int i = 1; i < pathLength; i++) {
-        int allPosibleDirections[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
-        int attempts = 0;
-        int newX, newY;
-        
-        do {
-            int dir = GetRandomValue(0, 3);
-            newX = currentX + allPosibleDirections[dir][0];
-            newY = currentY + allPosibleDirections[dir][1];
-            attempts++;
-        } while ((newX < 0 || newX >= MAP_WIDTH || 
-                 newY < 0 || newY >= MAP_HEIGHT ||
-                 rooms[newY][newX].type != RoomType::EMPTY) && attempts < 20);
-        
-        if (attempts < 20) {
-            connectRooms(currentX, currentY, newX, newY);
-            
-            currentX = newX;
-            currentY = newY;
+    int allPosibleDirections[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
 
-            RoomType roomType;
-            
-            if (i == pathLength - 1) {
+    std::vector<RoomCord> path = Map::GeneratePath(RoomCord{startX, startY});
+
+    for (size_t i = 0; i < path.size(); i++) {
+        RoomCord currentCord = path[i];
+
+        RoomType roomType;
+        if (i == 0) {
+            roomType = RoomType::START;
+        }else{
+            RoomCord prevCord = path[i-1];
+
+            connectRooms(prevCord.x, prevCord.y, currentCord.x, currentCord.y);
+
+            if (i == path.size() - 1) {
                 roomType = RoomType::BOSS;
             } else {
                 roomType = RoomType::NORMAL;
             }
-            rooms[currentY][currentX].gridX = currentX;
-            rooms[currentY][currentX].gridY = currentY;
-            rooms[currentY][currentX].bounds = roomBounds; 
-            rooms[currentY][currentX].type = roomType;
-            rooms[currentY][currentX].enemySpawns = generateEnemySpawns(rooms[currentY][currentX].type, roomBounds);
-        }
+        } 
+
+        rooms[currentCord.y][currentCord.x].type = roomType;
+        rooms[currentCord.y][currentCord.x].gridX = currentCord.x;
+        rooms[currentCord.y][currentCord.x].gridY = currentCord.y;
+        rooms[currentCord.y][currentCord.x].visited = false; /* TODO could be bug */
+        rooms[currentCord.y][currentCord.x].cleared = false;
+        rooms[currentCord.y][currentCord.x].bounds = roomBounds; 
+        rooms[currentCord.y][currentCord.x].enemySpawns = generateEnemySpawns(roomType, roomBounds);
     }
     
-    int extraRooms = GetRandomValue(2, 5);
+    int extraRooms = GetRandomValue(2, 4);
     for (int e = 0; e < extraRooms; e++) {
-        int baseX, baseY;
         int attempts = 0;
+        RoomCord baseRoom, newRoom;
+        bool founded = false; 
         do {
-            baseX = GetRandomValue(0, MAP_WIDTH - 1);
-            baseY = GetRandomValue(0, MAP_HEIGHT - 1);
-            attempts++;
-        } while (rooms[baseY][baseX].type == RoomType::EMPTY && attempts < 50);
-        
-        if (attempts < 50) {
-            int directions[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
-            int dir = GetRandomValue(0, 3);
+            baseRoom.x = GetRandomValue(0, MAP_WIDTH - 1);
+            baseRoom.y = GetRandomValue(0, MAP_HEIGHT - 1);
+            RoomType baseRoomType = rooms[baseRoom.y][baseRoom.x].type;
 
-            int newX = baseX + directions[dir][0];
-            int newY = baseY + directions[dir][1];
+            if(baseRoomType != RoomType::EMPTY && baseRoomType != RoomType::BOSS){
 
-            // check for 1 random empty room around finded room
-            if (newX >= 0 && newX < MAP_WIDTH && 
-                newY >= 0 && newY < MAP_HEIGHT &&
-                rooms[newY][newX].type == RoomType::EMPTY) {
-                
-                connectRooms(baseX, baseY, newX, newY);
-                rooms[newY][newX].type = RoomType::TREASURE;
-                rooms[newY][newX].gridX = newX;
-                rooms[newY][newX].gridY = newY;
-                rooms[newY][newX].bounds = roomBounds;
-                rooms[newY][newY].enemySpawns = generateEnemySpawns(RoomType::START, roomBounds);
+            
+                int dir = GetRandomValue(0, 3);
+                int i = 0;
+                while (i < 4){
+                    newRoom.x = baseRoom.x + allPosibleDirections[dir][0];
+                    newRoom.y = baseRoom.y + allPosibleDirections[dir][1];
+                    RoomType newRoomType = rooms[newRoom.y][newRoom.x].type;
+
+                    if (newRoom.x >= 0 && newRoom.x < MAP_WIDTH && 
+                        newRoom.y >= 0 && newRoom.y < MAP_HEIGHT &&
+                        newRoomType == RoomType::EMPTY) {
+                            founded = true;
+                            break;
+                    }
+
+                    dir = dir + 1 > 3 ? 0 : dir+1;
+
+                    i++;
+                }
             }
+            
+            attempts++;
+        } while (!founded && attempts < 50);
+        
+        if (founded) {
+            connectRooms(baseRoom.x, baseRoom.y, newRoom.x, newRoom.y);
+            rooms[newRoom.y][newRoom.x].type = RoomType::TREASURE;
+            rooms[newRoom.y][newRoom.x].gridX = newRoom.x;
+            rooms[newRoom.y][newRoom.x].gridY = newRoom.y;
+            rooms[newRoom.y][newRoom.x].bounds = roomBounds;
         }
     }
 
@@ -137,6 +175,7 @@ void Map::generate() {
     currentY = startY;
     
     generated = true;
+    
 }
 
 void Map::renderMinimap(int screenX, int screenY) const {

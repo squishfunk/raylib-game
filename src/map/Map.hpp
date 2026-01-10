@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include <cstdint>
+#include <set>
 #include <vector>
 #include "../components/Components.hpp"
 
@@ -11,6 +12,7 @@ class Game;
 
 constexpr int MAP_WIDTH = 5;
 constexpr int MAP_HEIGHT = 5;
+constexpr int MIN_MAP_PATH_LENGTH = 8;
 
 enum class RoomType {
     EMPTY,
@@ -71,6 +73,15 @@ struct Room {
     }
 };
 
+struct RoomCord {
+    int x;
+    int y;
+
+    bool operator==(const RoomCord& other) const {
+        return x == other.x && y == other.y;
+    }
+};
+
 class Map {
 private:
     Room rooms[MAP_HEIGHT][MAP_WIDTH];
@@ -90,7 +101,7 @@ public:
     // void renderCurrentRoom(int screenWidth, int screenHeight) const;
     bool canMoveTo(int newX, int newY) const;
     void moveToRoom(Game& game, int newX, int newY);
-
+    
     int getStartX() const { return startX; }
     int getStartY() const { return startY; }
     
@@ -102,6 +113,8 @@ public:
     Room& getRoom(int x, int y) { return rooms[y][x]; }
     bool isGenerated() const { return generated; }
     
+
+    static std::vector<RoomCord> GeneratePath(RoomCord startRoom);
     static void generateRoom(Game& game); /*  TODO DELETE */
     static void checkRoomCleared(Game& game); /*  TODO DELETE */
 };
