@@ -185,7 +185,7 @@ void Game::renderPlaying() const {
     ClearBackground(RAYWHITE);
 
     RenderSystem::render(ecs, map);
-    RenderSystem::renderUI(screenWidth, screenHeight);
+    RenderSystem::renderUI(ecs, screenWidth, screenHeight);
 
     if(DEBUG_MODE){
         DebugSystem::render(ecs, map, playerId, screenWidth, screenHeight);

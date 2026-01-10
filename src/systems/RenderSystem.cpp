@@ -2,6 +2,9 @@
 #include "../ecs/Ecs.hpp"
 #include "../components/Components.hpp"
 #include "../map/Map.hpp"
+#include "textures/TextureManager.hpp"
+#include "utils/Helpers.hpp"
+#include <cassert>
 #include <cstdio>
 #include <string>
 #include <raylib.h>
@@ -111,8 +114,7 @@ void RenderSystem::renderECS(const ECS& ecs){
                 DrawCircleV(transform.position, renderable.radius, renderable.color);
                 
                 EntityTag tags = entities[i].tags;
-                if (((tags & EntityTag::ENEMY) == EntityTag::ENEMY || 
-                     (tags & EntityTag::PLAYER) == EntityTag::PLAYER) && 
+                if ((tags & EntityTag::ENEMY) == EntityTag::ENEMY && 
                     healths.isActive(i)) {
                     renderHealthbar(ecs, i);
                 }
@@ -126,7 +128,7 @@ void RenderSystem::render(const ECS& ecs, const Map &map) {
     renderMinimap(map, 10, 10);
 }
 
-void RenderSystem::renderUI(int screenWidth, int screenHeight) {
+void RenderSystem::renderUI(const ECS& ecs, int screenWidth, int screenHeight) {
     float currentTime = GetTime();
     if (!lastPickedUpItemName.empty() && lastPickedUpItemTime >= 0.0f && currentTime - lastPickedUpItemTime < 2.0f) {
         float elapsed = currentTime - lastPickedUpItemTime;
@@ -145,6 +147,8 @@ void RenderSystem::renderUI(int screenWidth, int screenHeight) {
         Color textColor = {255, 255, 255, static_cast<unsigned char>(255 * alpha)};
         DrawText(text, x, y, fontSize, textColor);
     }
+
+    RenderSystem::renderPlayerHearths(ecs);
 }
 
 void RenderSystem::setPickedUpItemName(const std::string& name) {
@@ -152,3 +156,34 @@ void RenderSystem::setPickedUpItemName(const std::string& name) {
     lastPickedUpItemTime = GetTime();
 }
 
+void RenderSystem::renderPlayerHearths(const ECS& ecs){
+    int playerId = Helpers::getPlayerId(ecs);
+
+    const HealthComponent* health = ecs.getHealth(playerId);
+
+    assert(health && "Component Health not found on player");
+    
+    int fullHearthCount = health->healthPoints / 2;
+    int halfHearth = health->healthPoints % 2;
+    int remainingEmptyHearths = (health->maxHealthPoints - health->healthPoints) / 2;
+
+    Texture2D hearthFull = TextureManager::Get("UI/hearth_full.png");
+    Texture2D hearthHalf = TextureManager::Get("UI/hearth_half.png");
+    Texture2D hearthEmpty = TextureManager::Get("UI/hearth_empty.png");
+
+    float xPosition = 800;
+    float yPosition = 40;
+    float offset = 18;
+    for(int i = 0; i < fullHearthCount; i++){
+        DrawTextureRec(hearthFull, {0,0, 128, 128}, {xPosition, yPosition}, WHITE);
+        xPosition += offset;
+    }
+    for(int i = 0; i < halfHearth; i++){
+        DrawTextureRec(hearthHalf, {0,0, 128, 128}, {xPosition, yPosition}, WHITE);
+        xPosition += offset;
+    }
+    for(int i = 0; i < remainingEmptyHearths; i++){
+        DrawTextureRec(hearthEmpty, {0,0, 128, 128}, {xPosition, yPosition}, WHITE);
+        xPosition += offset;
+    }
+}

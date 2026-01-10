@@ -30,8 +30,9 @@ void DamageSystem::handleDamage(ECS& ecs, const CircleCollisionEvent& event) {
          (tag2 & EntityTag::PLAYER) == EntityTag::PLAYER)) {
         
         int playerId = (tag1 & EntityTag::PLAYER) == EntityTag::PLAYER ? id1 : id2;
+        int enemyId = (tag1 & EntityTag::ENEMY) == EntityTag::ENEMY ? id1 : id2;
         
-        DamageSystem::handleEnemyHitPlayer(ecs, playerId);
+        DamageSystem::handleEnemyHitPlayer(ecs, playerId, enemyId);
     }
     
 
@@ -57,11 +58,12 @@ void DamageSystem::handleDamage(ECS& ecs, const CircleCollisionEvent& event) {
 }
 
 
-void DamageSystem::handleEnemyHitPlayer(ECS &ecs, int playerId){
+void DamageSystem::handleEnemyHitPlayer(ECS &ecs, int playerId, int enemyId){
     float currentTime = GetTime();
 
     if (ecs.getHealths().isActive(playerId)) {
         auto& playerHealth = ecs.getHealths().get(playerId);
+        auto& enemyComponent = ecs.getEnemies().get(enemyId);
         
         bool canDamage = true;
         if (currentTime - playerHealth.lastDamageTime < DAMAGE_COOLDOWN) {
@@ -69,7 +71,7 @@ void DamageSystem::handleEnemyHitPlayer(ECS &ecs, int playerId){
         }
         
         if (canDamage) {
-            playerHealth.healthPoints -= ENEMY_DAMAGE;
+            playerHealth.healthPoints -= enemyComponent.damage;
             playerHealth.lastDamageTime = currentTime;
         }
     }

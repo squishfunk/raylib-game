@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <raylib.h>
 #include "BehaviourEffects.hpp"
 
 enum class DoorFlags : uint8_t;
@@ -19,8 +20,8 @@ constexpr float SHOOT_COOLDOWN = 0.25f;
 constexpr float BULLET_SPEED = 200.0f;
 constexpr float BULLET_RADIUS = 5.0f;
 constexpr float DAMAGE_COOLDOWN = 1.0f;
-constexpr int ENEMY_DAMAGE = 10;
-constexpr int BULLET_DAMAGE = 40;
+constexpr int ENEMY_DAMAGE = 1;
+constexpr int BULLET_DAMAGE = 1;
 
 enum class StatType {
     HEALTH,
@@ -106,6 +107,7 @@ struct DoorComponent {
 struct ShootableComponent {
     float lastShootTime;
     float shootingRange;
+    float damage;
     float shootingSpeed;
     float shootCooldown;
     Vector2 direction;
@@ -219,6 +221,10 @@ struct ItemComponent {
     std::vector<StatEffect> statEffects;
     std::vector<std::shared_ptr<BehaviourEffectBase>> behaviourEffects;
     bool isPickedUp = false;
+};
+
+struct SpriteRendererComponent {
+    Texture2D texture;
 };
 
 struct EnemyConfig {
