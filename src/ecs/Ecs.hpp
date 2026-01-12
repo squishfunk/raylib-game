@@ -86,6 +86,7 @@ private:
     ComponentStorage<StatsManagerComponent> statsManagers;
     ComponentStorage<BehaviourModifierComponent> behaviourModifiers;
     ComponentStorage<ItemComponent> items;
+    ComponentStorage<BulletComponent> bullets;
     
 public:
     ECS() : entityCount(0) {
@@ -142,6 +143,10 @@ public:
     void addItem(int entityId, const ItemComponent& itemComponent);
     ItemComponent* getItem(int entityId);
     const ItemComponent* getItem(int entityId) const;
+
+    void addBullet(int entityId, const BulletComponent& bulletComponent);
+    BulletComponent* getBullet(int entityId);
+    const BulletComponent* getBullet(int entityId) const;
     
     const std::array<Entity, MAX_ENTITIES>& getEntities() const { return entities; }
     std::array<Entity, MAX_ENTITIES>& getEntities() { return entities; }
@@ -182,6 +187,9 @@ public:
     
     ComponentStorage<ItemComponent>& getItems() { return items; }
     const ComponentStorage<ItemComponent>& getItems() const { return items; }
+
+    ComponentStorage<BulletComponent>& getBullets() { return bullets; }
+    const ComponentStorage<BulletComponent>& getBullets() const { return bullets; }
 };
 
 #endif // ECS_HPP

@@ -1,4 +1,6 @@
 #include "PlayerFactory.hpp"
+#include "components/BehaviourEffects.hpp"
+#include <memory>
 #include <raylib.h>
 
 static constexpr float PLAYER_RADIUS = 20.0f;

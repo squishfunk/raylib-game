@@ -1,4 +1,5 @@
 #include "Ecs.hpp"
+#include "components/Components.hpp"
 
 int ECS::createEntity() {
     for (int i = 0; i < entityCount; i++) {
@@ -18,6 +19,7 @@ int ECS::createEntity() {
             statsManagers.setActive(i, false);
             behaviourModifiers.setActive(i, false);
             items.setActive(i, false);
+            bullets.setActive(i, false);
             return i;
         }
     }
@@ -42,6 +44,7 @@ int ECS::createEntity() {
     statsManagers.setActive(entityId, false);
     behaviourModifiers.setActive(entityId, false);
     items.setActive(entityId, false);
+    items.setActive(entityId, false);
     
     return entityId;
 }
@@ -63,6 +66,7 @@ void ECS::destroyEntity(int entityId) {
     statsManagers.setActive(entityId, false);
     behaviourModifiers.setActive(entityId, false);
     items.setActive(entityId, false);
+    bullets.setActive(entityId, false);
 }
 
 void ECS::addTransform(int entityId, Vector2 position) {
@@ -234,3 +238,15 @@ const ItemComponent* ECS::getItem(int entityId) const {
     return items.getPtr(entityId);
 }
 
+void ECS::addBullet(int entityId, const BulletComponent& enemyComponent) {
+    bullets.get(entityId) = enemyComponent;
+    bullets.setActive(entityId, true);
+}
+
+BulletComponent* ECS::getBullet(int entityId) {
+    return bullets.getPtr(entityId);
+}
+
+const BulletComponent* ECS::getBullet(int entityId) const {
+    return bullets.getPtr(entityId);
+}

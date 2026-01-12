@@ -7,10 +7,11 @@ void BulletSystem::update(ECS& ecs, int screenWidth, int screenHeight) {
     const auto& entities = ecs.getEntities();
     int entityCount = ecs.getEntityCount();
     const auto& transforms = ecs.getTransforms();
+    const auto& bullets = ecs.getBullets();
     
     for (int i = 0; i < entityCount; i++) {
         if (!entities[i].active) continue;
-        if ((entities[i].tags & EntityTag::BULLET) != EntityTag::BULLET) continue;
+        if (!bullets.isActive(i)) continue;
         if (!transforms.isActive(i)) continue;
         
         const auto& bulletTransform = transforms.get(i);

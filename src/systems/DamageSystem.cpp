@@ -23,37 +23,31 @@ void DamageSystem::handleDamage(ECS& ecs, const CircleCollisionEvent& event) {
     
     EntityTag tag1 = entities[id1].tags;
     EntityTag tag2 = entities[id2].tags;
+
+    bool isBulletCollision = false;
+    if(ecs.getBullets().isActive(id1) || ecs.getBullets().isActive(id2)){
+        isBulletCollision = true;
+    }
     
-    if (((tag1 & EntityTag::PLAYER) == EntityTag::PLAYER && 
-         (tag2 & EntityTag::ENEMY) == EntityTag::ENEMY) ||
-        ((tag1 & EntityTag::ENEMY) == EntityTag::ENEMY && 
-         (tag2 & EntityTag::PLAYER) == EntityTag::PLAYER)) {
+    if(isBulletCollision){
+        int bulletId = ecs.getBullets().isActive(id1) ? id1 : id2;
+        EntityTag bulletTarget = ecs.getBullets().get(bulletId).targetTag;
+        int victimId = bulletId == id1 ? id2 : id1;
+
+        if ((entities[victimId].tags & bulletTarget) == bulletTarget){
+            DamageSystem::handleBulletHitEntity(ecs, bulletId, victimId);
+        }
+    }else{
+        if (((tag1 & EntityTag::PLAYER) == EntityTag::PLAYER && 
+            (tag2 & EntityTag::ENEMY) == EntityTag::ENEMY) ||
+            ((tag1 & EntityTag::ENEMY) == EntityTag::ENEMY && 
+            (tag2 & EntityTag::PLAYER) == EntityTag::PLAYER)) {
         
         int playerId = (tag1 & EntityTag::PLAYER) == EntityTag::PLAYER ? id1 : id2;
         int enemyId = (tag1 & EntityTag::ENEMY) == EntityTag::ENEMY ? id1 : id2;
         
         DamageSystem::handleEnemyHitPlayer(ecs, playerId, enemyId);
-    }
-    
-
-    if (((tag1 & EntityTag::BULLET) == EntityTag::BULLET && 
-         (tag2 & EntityTag::ENEMY) == EntityTag::ENEMY) ||
-        ((tag1 & EntityTag::ENEMY) == EntityTag::ENEMY && 
-         (tag2 & EntityTag::BULLET) == EntityTag::BULLET)) 
-    {
-        int bulletId = (tag1 & EntityTag::BULLET) == EntityTag::BULLET ? id1 : id2;
-        int enemyId = (tag1 & EntityTag::ENEMY) == EntityTag::ENEMY ? id1 : id2;
-        DamageSystem::handlePlayerBulletHitEnemy(ecs, bulletId, enemyId);
-    }
-
-    if (((tag1 & EntityTag::ENEMY_BULLET) == EntityTag::ENEMY_BULLET && 
-        (tag2 & EntityTag::PLAYER) == EntityTag::PLAYER) ||
-        ((tag1 & EntityTag::PLAYER) == EntityTag::PLAYER && 
-        (tag2 & EntityTag::ENEMY_BULLET) == EntityTag::ENEMY_BULLET)) 
-    {
-        int bulletId = (tag1 & EntityTag::ENEMY_BULLET) == EntityTag::ENEMY_BULLET ? id1 : id2;
-        int playerId = (tag1 & EntityTag::PLAYER) == EntityTag::PLAYER ? id1 : id2;
-        DamageSystem::handleEnemyBulletHitPlayer(ecs, bulletId, playerId);
+   }
     }
 }
 
@@ -77,39 +71,25 @@ void DamageSystem::handleEnemyHitPlayer(ECS &ecs, int playerId, int enemyId){
     }
 }
 
-void DamageSystem::handlePlayerBulletHitEnemy(ECS &ecs, int bulletId, int enemyId){
+void DamageSystem::handleBulletHitEntity(ECS &ecs, int bulletId, int victimId){
     float currentTime = GetTime();
+    auto* bullet = ecs.getBullet(bulletId);
+    auto* victimHealth = ecs.getHealth(victimId);
+    if(!bullet) return;
+    if(!victimHealth) return;
+    if(bullet->hitEntities.count(victimId)) return;
     
-    if (ecs.getHealths().isActive(enemyId)) {
-        auto& enemyHealth = ecs.getHealths().get(enemyId);
-        
-        enemyHealth.healthPoints -= BULLET_DAMAGE;
-        enemyHealth.lastDamageTime = currentTime;
-        
-        const auto& entities = ecs.getEntities();
-        if ((entities[bulletId].tags & EntityTag::PIERCING_BULLET) != EntityTag::PIERCING_BULLET) {
-            ecs.getEntities()[bulletId].active = false;
-        }
-        
-        if (ecs.getAudios().isActive(enemyId)) {
-            ecs.getAudio(enemyId)->play("HIT_SOUND");
-        }
-    }
-}
+    victimHealth->healthPoints -= bullet->damage;
+    victimHealth->lastDamageTime = currentTime;
 
-void DamageSystem::handleEnemyBulletHitPlayer(ECS &ecs, int bulletId, int playerId){
-    float currentTime = GetTime();
+    bullet->hitEntities.insert(victimId);
     
-    if (ecs.getHealths().isActive(playerId)) {
-        auto& enemyHealth = ecs.getHealths().get(playerId);
-        
-        enemyHealth.healthPoints -= BULLET_DAMAGE;
-        enemyHealth.lastDamageTime = currentTime;
-        
+    const auto& bullets = ecs.getBullets();
+    if (!bullets.get(bulletId).isPiercing) {
         ecs.getEntities()[bulletId].active = false;
-        
-        if (ecs.getAudios().isActive(playerId)) {
-            ecs.getAudio(playerId)->play("HIT_SOUND");
-        }
+    }
+    
+    if (ecs.getAudios().isActive(victimId) && ecs.getAudio(victimId)->hasSound("HIT_SOUND")) {
+        ecs.getAudio(victimId)->play("HIT_SOUND");
     }
 }

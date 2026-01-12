@@ -81,7 +81,6 @@ enum class EntityTag : uint8_t {
     BULLET = 1 << 2,
     ENEMY_BULLET = 1 << 3,
     ITEM = 1 << 4,
-    PIERCING_BULLET = 1 << 5,
 };
 
 inline EntityTag operator|(EntityTag a, EntityTag b) {
@@ -236,6 +235,13 @@ struct EnemyConfig {
     int damage;
     float attackCooldown;
     bool ranged;
+};
+
+struct BulletComponent {
+    int damage;
+    bool isPiercing;
+    std::set<int> hitEntities;
+    EntityTag targetTag;
 };
 
 #endif
