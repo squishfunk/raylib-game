@@ -61,7 +61,7 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
     }
     spawnDoors(room);
     
-    if (room.type == RoomType::TREASURE && !room.visited) {
+    if (room.type == RoomType::TREASURE && !room.cleared) {
         spawnItems(room);
     }
 }

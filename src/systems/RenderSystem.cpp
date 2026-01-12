@@ -128,7 +128,7 @@ void RenderSystem::render(const ECS& ecs, const Map &map) {
     renderMinimap(map, 10, 10);
 }
 
-void RenderSystem::renderUI(const ECS& ecs, int screenWidth, int screenHeight) {
+void RenderSystem::renderUI(const ECS& ecs, int screenWidth, int screenHeight, int currentLevel) {
     float currentTime = GetTime();
     if (!lastPickedUpItemName.empty() && lastPickedUpItemTime >= 0.0f && currentTime - lastPickedUpItemTime < 2.0f) {
         float elapsed = currentTime - lastPickedUpItemTime;
@@ -149,6 +149,11 @@ void RenderSystem::renderUI(const ECS& ecs, int screenWidth, int screenHeight) {
     }
 
     RenderSystem::renderPlayerHearths(ecs);
+
+    std::string levelText = "Level: " + std::to_string(currentLevel);
+    int fontSize = 12;
+    int padding = 10;
+    DrawText(levelText.c_str(), 100, padding, fontSize, BLACK);
 }
 
 void RenderSystem::setPickedUpItemName(const std::string& name) {
@@ -173,17 +178,17 @@ void RenderSystem::renderPlayerHearths(const ECS& ecs){
 
     float xPosition = 800;
     float yPosition = 40;
-    float offset = 18;
+    float offset = 32;
     for(int i = 0; i < fullHearthCount; i++){
-        DrawTextureRec(hearthFull, {0,0, 128, 128}, {xPosition, yPosition}, WHITE);
+        DrawTextureRec(hearthFull, {0,0, 32, 32}, {xPosition, yPosition}, WHITE);
         xPosition += offset;
     }
     for(int i = 0; i < halfHearth; i++){
-        DrawTextureRec(hearthHalf, {0,0, 128, 128}, {xPosition, yPosition}, WHITE);
+        DrawTextureRec(hearthHalf, {0,0, 32, 32}, {xPosition, yPosition}, WHITE);
         xPosition += offset;
     }
     for(int i = 0; i < remainingEmptyHearths; i++){
-        DrawTextureRec(hearthEmpty, {0,0, 128, 128}, {xPosition, yPosition}, WHITE);
+        DrawTextureRec(hearthEmpty, {0,0, 32, 32}, {xPosition, yPosition}, WHITE);
         xPosition += offset;
     }
 }

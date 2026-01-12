@@ -26,6 +26,7 @@ private:
     EventBus eventBus;
     int playerId;
     Dungeon *dungeonManager;
+    int currentLevel = 1;
     
     Map map;
     
@@ -41,7 +42,7 @@ private:
 
     void initGame();
     
-    
+    void nextLevel();
 public:
     Game(int screenWidth, int screenHeight, const std::string &gameName);
     ~Game();

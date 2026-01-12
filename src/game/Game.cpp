@@ -133,6 +133,7 @@ void Game::initGame(){
 
     map.init();
     map.generate();
+    currentLevel = 1;
 
     playerId = PlayerFactory::create(ecs, {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)});
 
@@ -149,6 +150,12 @@ void Game::initGame(){
     ItemSystem::init(ecs, eventBus);
 
     currentState = GameState::PLAYING;
+}
+
+void Game::nextLevel(){
+    currentLevel++;
+    initGame();
+
 }
 
 void Game::updatePlaying() {
@@ -172,6 +179,10 @@ void Game::updatePlaying() {
     ShootingSystem::update(ecs);
 
     if(DEBUG_MODE){
+        if(IsKeyPressed(KEY_N)){
+            Game::nextLevel();
+        }
+
         SetMasterVolume(0.0f);
         DebugSystem::update(ecs, map, dungeonManager, playerId);
     }
@@ -185,7 +196,7 @@ void Game::renderPlaying() const {
     ClearBackground(RAYWHITE);
 
     RenderSystem::render(ecs, map);
-    RenderSystem::renderUI(ecs, screenWidth, screenHeight);
+    RenderSystem::renderUI(ecs, screenWidth, screenHeight, currentLevel);
 
     if(DEBUG_MODE){
         DebugSystem::render(ecs, map, playerId, screenWidth, screenHeight);

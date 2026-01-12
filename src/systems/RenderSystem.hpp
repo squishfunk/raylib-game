@@ -15,7 +15,7 @@ private:
     
 public:
     static void render(const ECS& ecs, const Map &map);
-    static void renderUI(const ECS& ecs, int screenWidth, int screenHeight);
+    static void renderUI(const ECS& ecs, int screenWidth, int screenHeight, int currentLevel);
     static void setPickedUpItemName(const std::string& name);
 };
 
