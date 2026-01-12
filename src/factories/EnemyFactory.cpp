@@ -101,9 +101,8 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
     if(config->ranged){
         float shootingRange = 10; /*  TODO */
         float shootingSpeed = 800.0f; /*  TODO */
-        float shootCooldown = config->attackCooldown; /*  TODO */
 
-        ecs.addShootable(enemyId, shootingRange, shootingSpeed, shootCooldown);
+        ecs.addShootable(enemyId, shootingRange, shootingSpeed, config->attackCooldown);
     }
     
     float currentTime = GetTime();
@@ -113,10 +112,11 @@ int EnemyFactory::create(ECS& ecs, const EnemySpawnData& data) {
         .type = data.type,
         .damage = config->damage,
         .attackCooldown = config->attackCooldown,
-        .lastAttackTime = 0.0f,
         .lastSoundTime = 0.0f,
         .nextSoundTime = currentTime + randomDelay,
-        .ranged = config->ranged
+        .spawnTime = currentTime,
+        .spawnIdleDuration = 1.0f,
+        .ranged = config->ranged,
     };
     
     ecs.addEnemy(enemyId, enemyComp);

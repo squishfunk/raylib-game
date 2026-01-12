@@ -25,9 +25,12 @@ void EnemySystem::update(ECS& ecs) {
     for (int i = 0; i < entityCount; i++) {
         if (!entities[i].active) continue;
         if ((entities[i].tags & EntityTag::ENEMY) != EntityTag::ENEMY) continue;
+        if (!enemies.isActive(i)) continue;
+
+        auto& enemy = enemies.get(i);
 
         EnemySystem::handleShooting(ecs, i, playerId);
-        
+
         bool isAlive = false;
         if (healths.isActive(i)) {
             const auto& health = healths.get(i);
@@ -36,22 +39,12 @@ void EnemySystem::update(ECS& ecs) {
         
         if (!isAlive) continue;
         
-        Vector2 enemyPos = transforms.get(i).position;
-        Vector2 playerPos = playerTransform.position;
         
-        Vector2 direction = Vector2Subtract(playerPos, enemyPos);
-        
-        float length = Vector2Length(direction);
-        if (length < 0.001f) {
-            velocities.get(i).velocity = Vector2{0, 0};
-        } else {
-            Vector2 velocity = Vector2Normalize(direction);
-            velocities.get(i).velocity = velocity;
+        if(currentTime > enemy.spawnTime + enemy.spawnIdleDuration){
+            EnemySystem::HandleMove(ecs, i, playerTransform);
         }
         
-        if (enemies.isActive(i) && audios.isActive(i)) {
-            auto& enemy = enemies.get(i);
-            
+        if (audios.isActive(i)) {
             // Initialize next sound time if not set
             if (enemy.nextSoundTime == 0.0f) {
                 float randomDelay = 1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f)); // 1-5 seconds
@@ -89,3 +82,19 @@ void EnemySystem::handleShooting(ECS& ecs, int enemyId, int playerId) {
     shootable.shoot = true;
 }
 
+
+void EnemySystem::HandleMove(ECS& ecs, int enemyId, const TransformComponent& playerTransform) {
+    auto& enemyVelocity = ecs.getVelocities().get(enemyId);
+    Vector2 enemyPos = ecs.getTransforms().get(enemyId).position;
+    Vector2 playerPos = playerTransform.position;
+    
+    Vector2 direction = Vector2Subtract(playerPos, enemyPos);
+    
+    float length = Vector2Length(direction);
+    if (length < 0.001f) {
+        enemyVelocity.velocity = Vector2{0, 0};
+    } else {
+        Vector2 velocity = Vector2Normalize(direction);
+        enemyVelocity.velocity = velocity;
+    }
+}

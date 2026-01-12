@@ -17,7 +17,7 @@ enum class DoorFlags : uint8_t;
 constexpr int MAX_ENTITIES = 1024;
 constexpr float MOVEMENT_SPEED = 400.0f;
 constexpr float SHOOT_COOLDOWN = 0.25f;
-constexpr float BULLET_SPEED = 200.0f;
+constexpr float BULLET_SPEED = 500.0f;
 constexpr float BULLET_RADIUS = 5.0f;
 constexpr float DAMAGE_COOLDOWN = 1.0f;
 constexpr int ENEMY_DAMAGE = 1;
@@ -68,9 +68,10 @@ struct EnemyComponent {
     EnemyType type;
     int damage;
     float attackCooldown;
-    float lastAttackTime;
     float lastSoundTime;
     float nextSoundTime;
+    float spawnTime;
+    float spawnIdleDuration;
     bool ranged;
 };
 
@@ -79,7 +80,6 @@ enum class EntityTag : uint8_t {
     PLAYER = 1 << 0,
     ENEMY = 1 << 1,
     BULLET = 1 << 2,
-    ENEMY_BULLET = 1 << 3,
     ITEM = 1 << 4,
 };
 

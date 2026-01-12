@@ -1,5 +1,6 @@
 #include "Ecs.hpp"
 #include "components/Components.hpp"
+#include <raylib.h>
 
 int ECS::createEntity() {
     for (int i = 0; i < entityCount; i++) {
@@ -155,7 +156,7 @@ const DoorComponent* ECS::getDoor(int entityId) const {
 }
 
 void ECS::addShootable(int entityId, float shootingRange, float shootingSpeed, float shootCooldown) {
-    shootables.get(entityId).lastShootTime = 0.0f;
+    shootables.get(entityId).lastShootTime = (float) GetTime();
     shootables.get(entityId).shootingRange = shootingRange;
     shootables.get(entityId).shootingSpeed = shootingSpeed;
     shootables.get(entityId).shootCooldown = shootCooldown;
