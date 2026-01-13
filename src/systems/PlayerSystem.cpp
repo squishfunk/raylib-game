@@ -6,11 +6,13 @@
 #include <raylib.h>
 #include <raymath.h>
 
-void PlayerSystem::update(ECS &ecs){
+void PlayerSystem::update(ECS &ecs, Camera2D& camera){
     int playerId = Helpers::getPlayerId(ecs);
 
     PlayerSystem::handleInput(ecs, playerId);
     PlayerSystem::handleShooting(ecs, playerId);
+    PlayerSystem::handleCamera(ecs, playerId, camera);
+     
 }
 
 void PlayerSystem::handleInput(ECS& ecs, int playerId) {
@@ -71,3 +73,9 @@ void PlayerSystem::handleShooting(ECS& ecs, int playerId) {
     shootable.shoot = true;
 }
 
+void PlayerSystem::handleCamera(ECS& ecs, int playerId, Camera2D& camera){
+    if (playerId >= 0 && ecs.getEntities()[playerId].active && ecs.getTransforms().isActive(playerId)) {
+        const auto& playerTransform = ecs.getTransforms().get(playerId);
+        camera.target = playerTransform.position;
+    }
+}

@@ -29,6 +29,7 @@ private:
     int currentLevel = 1;
     
     Map map;
+    Camera2D camera;
     
     void updateMenu();
     void updatePlaying();

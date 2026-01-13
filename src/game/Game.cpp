@@ -17,6 +17,7 @@
 #include "../factories/PlayerFactory.hpp"
 #include "../map/Map.hpp"
 #include "../map/Dungeon.hpp"
+#include "../utils/Helpers.hpp"
 #include <cassert>
 #include <raylib.h>
 #include <cstdio>
@@ -149,6 +150,11 @@ void Game::initGame(){
     DamageSystem::init(ecs, eventBus);
     ItemSystem::init(ecs, eventBus);
 
+    camera.target = {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)};
+    camera.offset = {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)};
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
+
     currentState = GameState::PLAYING;
 }
 
@@ -167,7 +173,7 @@ void Game::updatePlaying() {
         return;
     }
     
-    PlayerSystem::update(ecs);
+    PlayerSystem::update(ecs, camera);
     BulletSystem::update(ecs, screenWidth, screenHeight);
     EnemySystem::update(ecs);
     MovementSystem::update(ecs);
@@ -195,7 +201,11 @@ void Game::updatePlaying() {
 void Game::renderPlaying() const {
     ClearBackground(RAYWHITE);
 
+    BeginMode2D(camera);
     RenderSystem::render(ecs, map);
+    EndMode2D();
+
+    RenderSystem::renderMinimap(map, 10, 10);
     RenderSystem::renderUI(ecs, screenWidth, screenHeight, currentLevel);
 
     if(DEBUG_MODE){
@@ -214,7 +224,10 @@ void Game::updatePaused() {
 
 void Game::renderPaused() const {
     ClearBackground((Color){200, 200, 200, 255});
+    
+    BeginMode2D(camera);
     RenderSystem::render(ecs, map);
+    EndMode2D();
     
     DrawRectangle(0, 0, this->screenWidth, this->screenHeight, (Color){0, 0, 0, 150});
     

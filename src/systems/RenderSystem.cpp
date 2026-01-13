@@ -125,7 +125,6 @@ void RenderSystem::renderECS(const ECS& ecs){
 
 void RenderSystem::render(const ECS& ecs, const Map &map) {
     renderECS(ecs);
-    renderMinimap(map, 10, 10);
 }
 
 void RenderSystem::renderUI(const ECS& ecs, int screenWidth, int screenHeight, int currentLevel) {

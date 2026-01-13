@@ -6,10 +6,11 @@
 class ECS;
 
 class PlayerSystem {
-public:
-    static void update(ECS &ecs);
     static void handleInput(ECS& ecs, int playerId);
     static void handleShooting(ECS& ecs, int playerId);
+    static void handleCamera(ECS& ecs, int playerId, Camera2D& camera);
+public:
+    static void update(ECS &ecs, Camera2D& camera);
 };
 
 #endif // PLAYER_SYSTEM_HPP
