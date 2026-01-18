@@ -24,6 +24,7 @@ private:
     void spawnRoom(const Room& room, DoorFlags entryDoor);
     void despawnCurrentRoom();
     void spawnEnemies(const Room& room);
+    void spawnWalls(const Room& room);
     void spawnDoors(const Room& room);
     void spawnItems(const Room& room);
     void onDoorCollision(const DoorCollisionEvent& event);

@@ -8,7 +8,8 @@ class ECS;
 
 namespace Helpers {
     bool checkCircleCollision(Vector2 pos1, float radius1, Vector2 pos2, float radius2);
-    bool checkCircleRectCollision(Vector2 circlePos, float circleRadius, Vector2 rectPos, float rectWidth, float rectHeight);
+    bool checkCircleRectCollision(Vector2 circlePos, float circleRadius, Rectangle rect, float tolerance = 0);
+    bool checkRectRectCollision(Vector2 rect1Pos, float rect1Width, float rect1Height, Vector2 rect2Pos, float rect2Width, float rect2Height);
     int getPlayerId(const ECS& ecs);
 }
 

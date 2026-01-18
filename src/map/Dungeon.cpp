@@ -3,6 +3,8 @@
 #include "../factories/DoorFactory.hpp"
 #include "../factories/EnemyFactory.hpp"
 #include "../factories/ItemFactory.hpp"
+#include "map/Room.hpp"
+#include "textures/TextureManager.hpp"
 #include <cassert>
 #include <cstdio>
 #include <raylib.h>
@@ -32,26 +34,29 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
 
     Vector2 newPosition {};
 
+    float margin = 200.0f;
+
     switch(entryDoor){
         case DoorFlags::UP: 
-            newPosition.x = room.bounds.width / 2.0f;
-            newPosition.y = 100.0f;
+            
+            newPosition.x = room.structure.gridWidth * 100 / 2.0f;
+            newPosition.y = margin;
             break;
         case DoorFlags::DOWN: 
-            newPosition.x = room.bounds.width / 2.0f;
-            newPosition.y = room.bounds.height - 100.0f;
+            newPosition.x = room.structure.gridWidth * 100  / 2.0f;
+            newPosition.y = room.structure.gridHeight * 100 - margin;
             break;
         case DoorFlags::LEFT: 
-            newPosition.x = 100.0f;
-            newPosition.y = room.bounds.height / 2.0f;
+            newPosition.x = margin;
+            newPosition.y = room.structure.gridHeight * 100  / 2.0f;
             break;
         case DoorFlags::RIGHT: 
-            newPosition.x = room.bounds.width - 100.0f;
-            newPosition.y = room.bounds.height / 2.0f;
+            newPosition.x = room.structure.gridWidth * 100 - margin;
+            newPosition.y = room.structure.gridHeight * 100 / 2.0f;
             break;
         default:
-            newPosition.x = room.bounds.width / 2.0f;
-            newPosition.y = room.bounds.height / 2.0f;
+            newPosition.x = room.structure.gridWidth * 100 / 2.0f;
+            newPosition.y = room.structure.gridHeight * 100 / 2.0f;
             break;
     }
     playerTransform->position = newPosition;
@@ -59,6 +64,8 @@ void Dungeon::spawnRoom(const Room& room, DoorFlags entryDoor) {
     if(!room.cleared){
         spawnEnemies(room);
     }
+
+    spawnWalls(room);
     spawnDoors(room);
     
     if (room.type == RoomType::TREASURE && !room.cleared) {
@@ -93,22 +100,88 @@ void Dungeon::spawnEnemies(const Room& room) {
     }
 }
 
-void Dungeon::spawnDoors(const Room& room) {
-    const DoorFlags allDoors[] = {
-        DoorFlags::UP,
-        DoorFlags::DOWN,
-        DoorFlags::LEFT,
-        DoorFlags::RIGHT
-    };
+void Dungeon::spawnWalls(const Room& room) {
+
+    // const DoorFlags allDoors[] = {
+    //     DoorFlags::UP,
+    //     DoorFlags::DOWN,
+    //     DoorFlags::LEFT,
+    //     DoorFlags::RIGHT
+    // };
     
-    for (DoorFlags doorFlag : allDoors) {
-        if ((room.doors & doorFlag) != DoorFlags::NONE) {
-            int door = DoorFactory::create(ecs, doorFlag, room.cleared);
-            if (door != -1) {
-                currentRoomEntities.push_back(door);
+    // for (DoorFlags doorFlag : allDoors) {
+    //     if ((room.doors & doorFlag) != DoorFlags::NONE) {
+    //         int door = DoorFactory::create(ecs, doorFlag, room.cleared);
+    //         if (door != -1) {
+    //             currentRoomEntities.push_back(door);
+    //         }
+    //     }
+    // }
+    
+    /* TOOD move to factory */
+    for(int gridY = 0; gridY < (int)room.structure.grid.size(); gridY++) {
+        for(int gridX = 0; gridX < (int)room.structure.grid[gridY].size(); gridX++) {
+
+            if(room.structure.grid[gridY][gridX] == TileType::WALL) {
+                float worldX = gridX * TILE_SIZE;
+                float worldY = gridY * TILE_SIZE;
+                
+                int wallId = ecs.createEntity();
+                ecs.addTransform(wallId, {worldX, worldY});
+                ecs.addSpriteRenderer(wallId, {TextureManager::Get("Environment/wall.png"), {0,0,100,100}});
+                ecs.addBoxCollider(wallId, 100, 100);
+            }
+
+            /* DOOR */
+            if(room.structure.grid[gridY][gridX] >= TileType::DOOR_UP && room.structure.grid[gridY][gridX] <= TileType::DOOR_LEFT) {
+
+
+
+                Vector2 position = {gridX * TILE_SIZE, gridY * TILE_SIZE};
+
+                DoorFlags doorFlag; 
+
+                switch(room.structure.grid[gridY][gridX]){
+                    case TileType::DOOR_UP:
+                        doorFlag = DoorFlags::UP;
+                        break;
+                    case TileType::DOOR_DOWN:
+                        doorFlag = DoorFlags::DOWN;
+                        break;
+                    case TileType::DOOR_LEFT:
+                        doorFlag = DoorFlags::LEFT;
+                        break;
+                    case TileType::DOOR_RIGHT:
+                        doorFlag = DoorFlags::RIGHT;
+                        break;
+                    default:
+                        assert(false);
+                        break;
+                }
+
+                
+                DoorFactory::create(ecs, position, doorFlag, room.cleared);
             }
         }
     }
+}
+
+void Dungeon::spawnDoors(const Room& room) {
+    // const DoorFlags allDoors[] = {
+    //     DoorFlags::UP,
+    //     DoorFlags::DOWN,
+    //     DoorFlags::LEFT,
+    //     DoorFlags::RIGHT
+    // };
+    
+    // for (DoorFlags doorFlag : allDoors) {
+    //     if ((room.doors & doorFlag) != DoorFlags::NONE) {
+    //         int door = DoorFactory::create(ecs, doorFlag, room.cleared);
+    //         if (door != -1) {
+    //             currentRoomEntities.push_back(door);
+    //         }
+    //     }
+    // }
 }
 
 void Dungeon::spawnItems(const Room& room) {

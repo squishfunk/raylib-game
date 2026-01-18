@@ -8,12 +8,12 @@
 #include <cstdio>
 
 void DamageSystem::init(ECS& ecs, EventBus& eventBus) {
-    eventBus.subscribe<CircleCollisionEvent>([&ecs](const CircleCollisionEvent& event) {
+    eventBus.subscribe<CollisionEvent>([&ecs](const CollisionEvent& event) {
         handleDamage(ecs, event);
     });
 }
 
-void DamageSystem::handleDamage(ECS& ecs, const CircleCollisionEvent& event) {
+void DamageSystem::handleDamage(ECS& ecs, const CollisionEvent& event) {
     const auto& entities = ecs.getEntities();
     int id1 = event.entityId1;
     int id2 = event.entityId2;

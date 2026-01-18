@@ -89,6 +89,7 @@ void RenderSystem::renderECS(const ECS& ecs){
     int entityCount = ecs.getEntityCount();
     const auto& transforms = ecs.getTransforms();
     const auto& renderables = ecs.getRenderables();
+    const auto& spriteRenderers = ecs.getSpriteRenderers();
     const auto& doors = ecs.getDoors();
     const auto& healths = ecs.getHealths();
     
@@ -96,9 +97,9 @@ void RenderSystem::renderECS(const ECS& ecs){
         if (!entities[i].active) continue;
 
         if (transforms.isActive(i)){
+            const TransformComponent &transform = transforms.get(i);
             /*  TODO renderables have to render doors and enemies */
             if(doors.isActive(i)){
-                const TransformComponent &transform = transforms.get(i);
                 const auto& door = doors.get(i);
 
                 Color color = GRAY;
@@ -118,6 +119,9 @@ void RenderSystem::renderECS(const ECS& ecs){
                     healths.isActive(i)) {
                     renderHealthbar(ecs, i);
                 }
+            }else if(spriteRenderers.isActive(i)){
+                const SpriteRendererComponent &spriteRenderer = spriteRenderers.get(i);
+                DrawTextureRec(spriteRenderer.texture, spriteRenderer.source, transform.position, WHITE);
             }
         }
     }

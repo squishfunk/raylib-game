@@ -87,6 +87,8 @@ private:
     ComponentStorage<BehaviourModifierComponent> behaviourModifiers;
     ComponentStorage<ItemComponent> items;
     ComponentStorage<BulletComponent> bullets;
+    ComponentStorage<SpriteRendererComponent> spriteRenderers;
+    ComponentStorage<BoxColliderComponent> boxColliders;
     
 public:
     ECS() : entityCount(0) {
@@ -147,6 +149,14 @@ public:
     void addBullet(int entityId, const BulletComponent& bulletComponent);
     BulletComponent* getBullet(int entityId);
     const BulletComponent* getBullet(int entityId) const;
+
+    void addSpriteRenderer(int entityId, const SpriteRendererComponent& spriteRendererComponent);
+    SpriteRendererComponent* getSpriteRenderer(int entityId);
+    const SpriteRendererComponent* getSpriteRenderer(int entityId) const;
+    
+    void addBoxCollider(int entityId, float width, float height, bool isTrigger = false);
+    BoxColliderComponent* getBoxCollider(int entityId);
+    const BoxColliderComponent* getBoxCollider(int entityId) const;
     
     const std::array<Entity, MAX_ENTITIES>& getEntities() const { return entities; }
     std::array<Entity, MAX_ENTITIES>& getEntities() { return entities; }
@@ -190,6 +200,12 @@ public:
 
     ComponentStorage<BulletComponent>& getBullets() { return bullets; }
     const ComponentStorage<BulletComponent>& getBullets() const { return bullets; }
+
+    ComponentStorage<SpriteRendererComponent>& getSpriteRenderers() { return spriteRenderers; }
+    const ComponentStorage<SpriteRendererComponent>& getSpriteRenderers() const { return spriteRenderers; }
+    
+    ComponentStorage<BoxColliderComponent>& getBoxColliders() { return boxColliders; }
+    const ComponentStorage<BoxColliderComponent>& getBoxColliders() const { return boxColliders; }
 };
 
 #endif // ECS_HPP

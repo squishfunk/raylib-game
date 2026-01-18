@@ -21,6 +21,8 @@ int ECS::createEntity() {
             behaviourModifiers.setActive(i, false);
             items.setActive(i, false);
             bullets.setActive(i, false);
+            spriteRenderers.setActive(i, false);
+            boxColliders.setActive(i, false);
             return i;
         }
     }
@@ -45,7 +47,9 @@ int ECS::createEntity() {
     statsManagers.setActive(entityId, false);
     behaviourModifiers.setActive(entityId, false);
     items.setActive(entityId, false);
-    items.setActive(entityId, false);
+    bullets.setActive(entityId, false);
+    spriteRenderers.setActive(entityId, false);
+    boxColliders.setActive(entityId, false);
     
     return entityId;
 }
@@ -68,6 +72,8 @@ void ECS::destroyEntity(int entityId) {
     behaviourModifiers.setActive(entityId, false);
     items.setActive(entityId, false);
     bullets.setActive(entityId, false);
+    spriteRenderers.setActive(entityId, false);
+    boxColliders.setActive(entityId, false);
 }
 
 void ECS::addTransform(int entityId, Vector2 position) {
@@ -250,4 +256,32 @@ BulletComponent* ECS::getBullet(int entityId) {
 
 const BulletComponent* ECS::getBullet(int entityId) const {
     return bullets.getPtr(entityId);
+}
+
+void ECS::addSpriteRenderer(int entityId, const SpriteRendererComponent& spriteRendererComponent) {
+    spriteRenderers.get(entityId) = spriteRendererComponent;
+    spriteRenderers.setActive(entityId, true);
+}
+
+SpriteRendererComponent* ECS::getSpriteRenderer(int entityId) {
+    return spriteRenderers.getPtr(entityId);
+}
+
+const SpriteRendererComponent* ECS::getSpriteRenderer(int entityId) const {
+    return spriteRenderers.getPtr(entityId);
+}
+
+void ECS::addBoxCollider(int entityId, float width, float height, bool isTrigger) {
+    boxColliders.get(entityId).width = width;
+    boxColliders.get(entityId).height = height;
+    boxColliders.get(entityId).isTrigger = isTrigger;
+    boxColliders.setActive(entityId, true);
+}
+
+BoxColliderComponent* ECS::getBoxCollider(int entityId) {
+    return boxColliders.getPtr(entityId);
+}
+
+const BoxColliderComponent* ECS::getBoxCollider(int entityId) const {
+    return boxColliders.getPtr(entityId);
 }

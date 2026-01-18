@@ -174,7 +174,7 @@ void Game::updatePlaying() {
     }
     
     PlayerSystem::update(ecs, camera);
-    BulletSystem::update(ecs, screenWidth, screenHeight);
+    BulletSystem::update(ecs, map);
     EnemySystem::update(ecs);
     MovementSystem::update(ecs);
     CollisionDetectionSystem::update(ecs, eventBus);

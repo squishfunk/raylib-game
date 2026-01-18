@@ -224,6 +224,13 @@ struct ItemComponent {
 
 struct SpriteRendererComponent {
     Texture2D texture;
+    Rectangle source;
+};
+
+struct BoxColliderComponent {
+    float width;
+    float height;
+    bool isTrigger;
 };
 
 struct EnemyConfig {

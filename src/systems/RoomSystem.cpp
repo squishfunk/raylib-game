@@ -41,27 +41,27 @@ void RoomSystem::updateClearedFlag(ECS& ecs, Map& map) {
 }
 
 void RoomSystem::updateEntitiesPositionsToRoomBounds(ECS &ecs){
-    int entityCount = ecs.getEntityCount();
+    // int entityCount = ecs.getEntityCount();
 
-    const auto& entities = ecs.getEntities();
+    // const auto& entities = ecs.getEntities();
 
-    for (int i = 0; i < entityCount; i++){
-        if(!entities[i].active) continue;
-        if(!((entities[i].tags & EntityTag::PLAYER) == EntityTag::PLAYER)) continue;
-        auto& playerTransform = ecs.getTransforms().get(i);
-        if(playerTransform.position.x >= SCREEN_WIDTH){
-            playerTransform.position.x = SCREEN_WIDTH;
-        }
-        if(playerTransform.position.x <= 0){
-            playerTransform.position.x = 0;
-        }
-        if(playerTransform.position.y >= SCREEN_HEIGHT){
-            playerTransform.position.y = SCREEN_HEIGHT;
-        }
-        if(playerTransform.position.y <= 0){
-            playerTransform.position.y = 0;
-        }
-    }
+    // for (int i = 0; i < entityCount; i++){
+    //     if(!entities[i].active) continue;
+    //     if(!((entities[i].tags & EntityTag::PLAYER) == EntityTag::PLAYER)) continue;
+    //     auto& playerTransform = ecs.getTransforms().get(i);
+    //     if(playerTransform.position.x >= SCREEN_WIDTH){
+    //         playerTransform.position.x = SCREEN_WIDTH;
+    //     }
+    //     if(playerTransform.position.x <= 0){
+    //         playerTransform.position.x = 0;
+    //     }
+    //     if(playerTransform.position.y >= SCREEN_HEIGHT){
+    //         playerTransform.position.y = SCREEN_HEIGHT;
+    //     }
+    //     if(playerTransform.position.y <= 0){
+    //         playerTransform.position.y = 0;
+    //     }
+    // }
 }
 
 void RoomSystem::update(ECS& ecs, Map& map) {

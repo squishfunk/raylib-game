@@ -3,12 +3,12 @@
 
 class ECS;
 class EventBus;
-struct CircleCollisionEvent;
+struct CollisionEvent;
 
 class DamageSystem {
 public:
     static void init(ECS& ecs, EventBus& eventBus);
-    static void handleDamage(ECS& ecs, const CircleCollisionEvent& event);
+    static void handleDamage(ECS& ecs, const CollisionEvent& event);
     static void handleEnemyHitPlayer(ECS &ecs, int playerId, int enemyId);
     static void handleBulletHitEntity(ECS &ecs, int bulletId, int victimId);
 };

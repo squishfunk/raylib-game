@@ -1,5 +1,6 @@
 #include "Map.hpp"
 #include "../components/Components.hpp"
+#include "map/Room.hpp"
 #include <algorithm>
 #include <cstring>
 #include <cstdlib>
@@ -42,6 +43,26 @@ void Map::connectRooms(int x1, int y1, int x2, int y2) {
     } else if (y2 < y1) {
         room1.doors = room1.doors | DoorFlags::UP;
         room2.doors = room2.doors | DoorFlags::DOWN;
+    }
+
+    /* on the top delete in future  */
+
+
+    if (x2 > x1) {
+        
+        room1.structure.grid[(room1.structure.gridHeight - 1) / 2][room1.structure.gridWidth - 1] = TileType::DOOR_RIGHT;
+        room2.structure.grid[(room2.structure.gridHeight - 1) / 2][0] = TileType::DOOR_LEFT;
+    } else if (x2 < x1) {
+        room1.structure.grid[(room1.structure.gridHeight - 1) / 2][0] = TileType::DOOR_LEFT;
+        room2.structure.grid[(room2.structure.gridHeight - 1) / 2][room2.structure.gridWidth - 1] = TileType::DOOR_RIGHT;
+    }
+    
+    if (y2 > y1) {
+        room1.structure.grid[room1.structure.gridHeight - 1][(room1.structure.gridWidth - 1) / 2] = TileType::DOOR_DOWN;
+        room2.structure.grid[0][(room2.structure.gridWidth - 1) / 2] = TileType::DOOR_UP;
+    } else if (y2 < y1) {
+        room1.structure.grid[0][(room1.structure.gridWidth - 1) / 2] = TileType::DOOR_UP;
+        room2.structure.grid[room2.structure.gridHeight - 1][(room2.structure.gridWidth - 1) / 2] = TileType::DOOR_DOWN;
     }
 }
 
@@ -106,10 +127,6 @@ void Map::generate() {
         if (i == 0) {
             roomType = RoomType::START;
         }else{
-            RoomCord prevCord = path[i-1];
-
-            connectRooms(prevCord.x, prevCord.y, currentCord.x, currentCord.y);
-
             if (i == path.size() - 1) {
                 roomType = RoomType::BOSS;
             } else {
@@ -120,10 +137,16 @@ void Map::generate() {
         rooms[currentCord.y][currentCord.x].type = roomType;
         rooms[currentCord.y][currentCord.x].gridX = currentCord.x;
         rooms[currentCord.y][currentCord.x].gridY = currentCord.y;
-        rooms[currentCord.y][currentCord.x].visited = false; /* TODO could be bug */
+        rooms[currentCord.y][currentCord.x].visited = false;
         rooms[currentCord.y][currentCord.x].cleared = false;
         rooms[currentCord.y][currentCord.x].bounds = roomBounds; 
-        rooms[currentCord.y][currentCord.x].enemySpawns = generateEnemySpawns(roomType, roomBounds);
+        rooms[currentCord.y][currentCord.x].GenerateEnemySpawns();
+        rooms[currentCord.y][currentCord.x].GenerateRoomShape();
+
+        if(i != 0){
+            RoomCord prevCord = path[i-1];
+            connectRooms(prevCord.x, prevCord.y, currentCord.x, currentCord.y);
+        }
     }
     
     int extraRooms = GetRandomValue(2, 4);
@@ -163,11 +186,12 @@ void Map::generate() {
         } while (!founded && attempts < 50);
         
         if (founded) {
-            connectRooms(baseRoom.x, baseRoom.y, newRoom.x, newRoom.y);
             rooms[newRoom.y][newRoom.x].type = RoomType::TREASURE;
             rooms[newRoom.y][newRoom.x].gridX = newRoom.x;
             rooms[newRoom.y][newRoom.x].gridY = newRoom.y;
             rooms[newRoom.y][newRoom.x].bounds = roomBounds;
+            rooms[newRoom.y][newRoom.x].GenerateRoomShape();
+            connectRooms(baseRoom.x, baseRoom.y, newRoom.x, newRoom.y);
         }
     }
 
@@ -222,101 +246,4 @@ void Map::renderMinimap(int screenX, int screenY) const {
                 DrawLine(px + cellSize, py + cellSize/2, px + cellSize + 3, py + cellSize/2, WHITE);
         }
     }
-}
-
-std::vector<EnemySpawn> Map::generateEnemySpawns(RoomType roomType, const Rectangle& bounds) {
-    std::vector<EnemySpawn> spawns;
-    
-    switch (roomType) {
-        case RoomType::START:
-            if (GetRandomValue(0, 100) < 30) {
-                int count = GetRandomValue(1, 2);
-                for (int i = 0; i < count; i++) {
-                    float x = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.width) - 100));
-                    float y = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.height) - 100));
-                    spawns.push_back(EnemySpawn{Vector2{x, y}, EnemyType::NORMAL});
-                }
-            }
-            break;
-            
-        case RoomType::NORMAL:
-            {
-                int count = GetRandomValue(2, 5);
-                for (int i = 0; i < count; i++) {
-                    float x = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.width) - 50));
-                    float y = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.height) - 50));
-                    
-                    int typeRoll = GetRandomValue(0, 100);
-                    EnemyType type;
-                    if (typeRoll < 40) {
-                        type = EnemyType::NORMAL;
-                    }
-                    else if (typeRoll < 60) {
-                        type = EnemyType::RANGED_NORMAL;
-                    }
-                    else if (typeRoll < 80) {
-                        type = EnemyType::RANGED_TANK;
-                    }
-                    else if (typeRoll < 95) {
-                        type = EnemyType::FAST;
-                    }
-                    else {
-                        type = EnemyType::TANK;
-                    }
-                    
-                    spawns.push_back(EnemySpawn{Vector2{x, y}, type});
-                }
-            }
-            break;
-            
-        case RoomType::BOSS:
-            {
-                spawns.push_back(EnemySpawn{
-                    Vector2{bounds.width / 2.0f, bounds.height / 2.0f}, 
-                    EnemyType::BOSS
-                });
-                
-                int minionCount = GetRandomValue(2, 4);
-                for (int i = 0; i < minionCount; i++) {
-                    float angle = (i * 360.0f / minionCount) * DEG2RAD;
-                    float radius = 200.0f;
-                    float x = bounds.width / 2.0f + cosf(angle) * radius;
-                    float y = bounds.height / 2.0f + sinf(angle) * radius;
-                    
-                    x = (x < 50) ? 50 : (x > bounds.width - 50) ? bounds.width - 50 : x;
-                    y = (y < 50) ? 50 : (y > bounds.height - 50) ? bounds.height - 50 : y;
-                    
-                    spawns.push_back(EnemySpawn{Vector2{x, y}, EnemyType::NORMAL});
-                }
-            }
-            break;
-            
-        case RoomType::TREASURE:
-            if (GetRandomValue(0, 100) < 60) {
-                int count = GetRandomValue(1, 3);
-                for (int i = 0; i < count; i++) {
-                    float x = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.width) - 100));
-                    float y = static_cast<float>(GetRandomValue(100, static_cast<int>(bounds.height) - 100));
-                    spawns.push_back(EnemySpawn{Vector2{x, y}, EnemyType::TANK});
-                }
-            }
-            break;
-            
-        case RoomType::SECRET:
-            if (GetRandomValue(0, 100) < 40) {
-                int count = GetRandomValue(1, 2);
-                for (int i = 0; i < count; i++) {
-                    float x = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.width) - 50));
-                    float y = static_cast<float>(GetRandomValue(50, static_cast<int>(bounds.height) - 50));
-                    spawns.push_back(EnemySpawn{Vector2{x, y}, EnemyType::FAST});
-                }
-            }
-            break;
-            
-        case RoomType::EMPTY:
-        default:
-            break;
-    }
-    
-    return spawns;
 }
