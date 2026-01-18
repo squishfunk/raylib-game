@@ -134,7 +134,6 @@ void Game::initGame(){
 
     map.init();
     map.generate();
-    currentLevel = 1;
 
     playerId = PlayerFactory::create(ecs, {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)});
 
@@ -149,6 +148,7 @@ void Game::initGame(){
 
     DamageSystem::init(ecs, eventBus);
     ItemSystem::init(ecs, eventBus);
+    BulletSystem::init(ecs, eventBus);
 
     camera.target = {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)};
     camera.offset = {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)};
@@ -161,7 +161,6 @@ void Game::initGame(){
 void Game::nextLevel(){
     currentLevel++;
     initGame();
-
 }
 
 void Game::updatePlaying() {
@@ -174,7 +173,6 @@ void Game::updatePlaying() {
     }
     
     PlayerSystem::update(ecs, camera);
-    BulletSystem::update(ecs, map);
     EnemySystem::update(ecs);
     MovementSystem::update(ecs);
     CollisionDetectionSystem::update(ecs, eventBus);
