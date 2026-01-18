@@ -99,7 +99,6 @@ static void checkAllCollisions(ECS& ecs, EventBus& eventBus) {
                     rect, 0.0f)) {
                     
                     if (boxCollider.isTrigger || circleCollider.isTrigger) {
-                        std::cout << "TEST \n";
                         CollisionEvent event(i, j);
                         eventBus.emit(event);
                     }
