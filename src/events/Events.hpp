@@ -2,6 +2,7 @@
 #define EVENTS_HPP
 
 #include "../map/Map.hpp"
+#include "map/Room.hpp"
 
 struct DoorCollisionEvent {
     int entityId;
@@ -25,6 +26,17 @@ struct ItemPickupEvent {
     
     ItemPickupEvent(int playerId, int itemId, const std::string& name = "") 
         : playerEntityId(playerId), itemEntityId(itemId) {}
+};
+
+struct ClearedRoomEvent {
+    RoomCord roomCord;
+
+    ClearedRoomEvent(RoomCord roomCord): roomCord(roomCord)
+    {}
+};
+
+struct NextLevelEvent{
+    NextLevelEvent() = default;
 };
 
 #endif 

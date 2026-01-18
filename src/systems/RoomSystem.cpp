@@ -4,11 +4,13 @@
 #include "../map/Map.hpp"
 #include "RoomSystem.hpp"
 #include <raylib.h>
+#include "events/Events.hpp"
+#include "events/EventBus.hpp"
 
 constexpr int SCREEN_HEIGHT = 650;
 constexpr int SCREEN_WIDTH = 1000;
 
-void RoomSystem::updateClearedFlag(ECS& ecs, Map& map) {
+void RoomSystem::updateClearedFlag(ECS& ecs, Map& map, EventBus& eventBus) {
     Room& currentRoom = map.getRoom(map.getCurrentX(), map.getCurrentY());
     
     if (currentRoom.cleared) return;
@@ -25,7 +27,8 @@ void RoomSystem::updateClearedFlag(ECS& ecs, Map& map) {
     }
     
     if (!hasActiveEnemies) {
-        /* TODO Emit event */
+        ClearedRoomEvent event({currentRoom.gridX, currentRoom.gridY});
+        eventBus.emit(event);
         currentRoom.cleared = true;
     }
 
@@ -64,8 +67,8 @@ void RoomSystem::updateEntitiesPositionsToRoomBounds(ECS &ecs){
     // }
 }
 
-void RoomSystem::update(ECS& ecs, Map& map) {
-    updateClearedFlag(ecs, map);
+void RoomSystem::update(ECS& ecs, Map& map, EventBus& eventBus) {
+    updateClearedFlag(ecs, map, eventBus);
     updateEntitiesPositionsToRoomBounds(ecs);
 }
 

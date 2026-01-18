@@ -42,6 +42,7 @@ private:
     void renderGameOver() const;
 
     void initGame();
+    void initLevel();
     
     void nextLevel();
 public:

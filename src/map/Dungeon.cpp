@@ -3,6 +3,7 @@
 #include "../factories/DoorFactory.hpp"
 #include "../factories/EnemyFactory.hpp"
 #include "../factories/ItemFactory.hpp"
+#include "events/Events.hpp"
 #include "map/Room.hpp"
 #include "textures/TextureManager.hpp"
 #include <cassert>
@@ -15,6 +16,10 @@ Dungeon::Dungeon(ECS& ecs, Map &map, int playerId, EventBus& eventBus):
     
     eventBus.subscribe<DoorCollisionEvent>([this](const DoorCollisionEvent& event) {
         onDoorCollision(event);
+    });
+
+    eventBus.subscribe<ClearedRoomEvent>([this](const ClearedRoomEvent& event) {
+        onRoomClearEvent(event);
     });
 }
 
@@ -241,6 +246,13 @@ void Dungeon::onDoorCollision(const DoorCollisionEvent& event) {
     DoorFlags entryDoor = getOppositeDoor(event.doorDirection);
     
     loadRoom(targetRoom, entryDoor);
+}
+
+void Dungeon::onRoomClearEvent(const ClearedRoomEvent& event){
+    if(map.getCurrentRoom().type == RoomType::BOSS){
+        NextLevelEvent e;
+        eventBus.emit(e);
+    }
 }
 
 DoorFlags Dungeon::getOppositeDoor(DoorFlags door) const {

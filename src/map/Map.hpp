@@ -34,10 +34,9 @@ public:
     
     int getStartX() const { return startX; }
     int getStartY() const { return startY; }
-    
     int getCurrentX() const { return currentX; }
     int getCurrentY() const { return currentY; }
-    Room& getCurrentRoom() { return rooms[currentX][currentY]; }
+    Room& getCurrentRoom() { return rooms[currentY][currentX]; }
     void setCurrentRoom(int x, int y) { currentX = x; currentY = y; }
     const Room& getRoom(int x, int y) const { return rooms[y][x]; }
     Room& getRoom(int x, int y) { return rooms[y][x]; }

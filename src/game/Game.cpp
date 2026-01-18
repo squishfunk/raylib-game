@@ -127,28 +127,10 @@ void Game::renderMenu() const {
 }
 
 void Game::initGame(){
-    delete dungeonManager;
-
     ecs = ECS();
-    eventBus = EventBus();
-
-    map.init();
-    map.generate();
-
     playerId = PlayerFactory::create(ecs, {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)});
 
-    int startX = map.getStartX();
-    int startY = map.getStartY();
-
-    const Room& startRoom = map.getRoom(startX, startY);
-    assert(startRoom.type == RoomType::START && "Error: Start room is not a START room!");
-
-    dungeonManager = new Dungeon(ecs, map, playerId, eventBus);
-    dungeonManager->loadRoom(startRoom, DoorFlags::NONE);
-
-    DamageSystem::init(ecs, eventBus);
-    ItemSystem::init(ecs, eventBus);
-    BulletSystem::init(ecs, eventBus);
+    initLevel();
 
     camera.target = {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)};
     camera.offset = {static_cast<float>(screenWidth / 2.0f), static_cast<float>(screenHeight / 2.0f)};
@@ -158,9 +140,33 @@ void Game::initGame(){
     currentState = GameState::PLAYING;
 }
 
+void Game::initLevel(){
+    eventBus = EventBus();
+
+    eventBus.subscribe<NextLevelEvent>([this](const NextLevelEvent& event) {
+        nextLevel();
+    });
+
+    delete dungeonManager;
+
+    map.generate();
+    int startX = map.getStartX();
+    int startY = map.getStartY();
+
+    DamageSystem::init(ecs, eventBus);
+    ItemSystem::init(ecs, eventBus);
+    BulletSystem::init(ecs, eventBus);
+
+    const Room& startRoom = map.getRoom(startX, startY);
+    assert(startRoom.type == RoomType::START && "Error: Start room is not a START room!");
+
+    dungeonManager = new Dungeon(ecs, map, playerId, eventBus);
+    dungeonManager->loadRoom(startRoom, DoorFlags::NONE);
+}
+
 void Game::nextLevel(){
     currentLevel++;
-    initGame();
+    initLevel();
 }
 
 void Game::updatePlaying() {
@@ -178,7 +184,7 @@ void Game::updatePlaying() {
     CollisionDetectionSystem::update(ecs, eventBus);
     PickupSystem::update(ecs, eventBus);
     HealthSystem::update(ecs);
-    RoomSystem::update(ecs, map);
+    RoomSystem::update(ecs, map, eventBus);
     DoorSystem::update(ecs, eventBus);
     ShootingSystem::update(ecs);
 
